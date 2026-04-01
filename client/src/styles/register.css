@@ -1,0 +1,497 @@
+/* =========================
+   REGISTRATION HUB - GAMER UI DESIGN
+   ========================= */
+
+/* ---------- MAIN CONTAINER ---------- */
+.registration-hub {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+  position: relative;
+  overflow-x: hidden;
+  padding-top: clamp(60px, 8vw, 80px);
+}
+
+.registration-hub::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(900px 420px at 10% -10%, rgba(0, 255, 163, 0.15), transparent 55%),
+              radial-gradient(900px 420px at 110% 0%, rgba(138, 43, 226, 0.15), transparent 55%);
+  opacity: 0.8;
+  z-index: 1;
+}
+
+/* ---------- CONTENT WRAPPER ---------- */
+.registration-content {
+  position: relative;
+  z-index: 2;
+  max-width: clamp(320px, 90vw, 1200px);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem);
+  min-height: calc(100vh - clamp(60px, 8vw, 80px));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+/* ---------- NAVIGATION ---------- */
+.hub-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-sticky);
+  background: rgba(10, 10, 15, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid transparent;
+  background-clip: padding-box;
+  height: clamp(60px, 8vw, 80px);
+  width: 100%;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.hub-navbar::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-blue));
+  animation: gradient-flow 3s ease-in-out infinite;
+}
+
+@keyframes gradient-flow {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+}
+
+.hub-navbar > * {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: clamp(320px, 90vw, 1200px);
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 2rem);
+  height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.hub-navbar a {
+  font-size: clamp(1.25rem, 4vw, 2rem);
+  font-weight: 900;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: var(--glow-cyan);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.hub-navbar a:hover {
+  text-shadow: var(--glow-purple);
+  transform: translateY(-2px);
+}
+
+.hub-navbar > div {
+  display: flex;
+  gap: clamp(0.5rem, 2vw, 1rem);
+  position: relative;
+  z-index: 2;
+}
+
+.hub-navbar button {
+  padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem);
+  border: 2px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.hub-navbar button:hover {
+  border-color: var(--neon-cyan);
+  background: rgba(0, 255, 163, 0.1);
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0, 255, 163, 0.6);
+  transform: translateY(-2px);
+}
+
+.hub-navbar button.active {
+  border-color: var(--neon-cyan);
+  background: rgba(0, 255, 163, 0.15);
+  color: var(--neon-cyan);
+  text-shadow: var(--glow-cyan);
+}
+
+/* ---------- STATUS MESSAGES ---------- */
+.error-message,
+.success-message {
+  max-width: clamp(320px, 90vw, 600px);
+  margin: 0 auto clamp(1rem, 3vw, 2rem);
+  padding: clamp(0.875rem, 2vw, 1.125rem);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  text-align: center;
+  border: 2px solid;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.error-message::before,
+.success-message::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: currentColor;
+}
+
+.error-message {
+  color: var(--danger);
+  background: rgba(255, 59, 59, 0.15);
+  border-color: rgba(255, 59, 59, 0.4);
+  box-shadow: 0 0 20px rgba(255, 59, 59, 0.2);
+}
+
+.success-message {
+  color: var(--success);
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+/* ---------- GAMER REGISTRATION FORMS ---------- */
+.registration-hub form {
+  max-width: clamp(320px, 90vw, 500px);
+  margin: 0 auto;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  padding: clamp(2rem, 5vw, 3rem);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  transition: all 0.4s ease;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.25rem, 3.5vw, 1.75rem);
+  width: 100%;
+}
+
+.registration-hub form::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  animation: gradient-flow 3s ease-in-out infinite;
+}
+
+.registration-hub form::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(0, 255, 163, 0.1), transparent 50%),
+              radial-gradient(circle at 100% 100%, rgba(138, 43, 226, 0.1), transparent 50%);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.registration-hub form:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 60px rgba(0, 255, 163, 0.2);
+  border-color: var(--neon-cyan);
+}
+
+.registration-hub form h2 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 900;
+  margin-bottom: clamp(1rem, 3vw, 1.5rem);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: var(--glow-cyan);
+  text-align: center;
+  position: relative;
+}
+
+.registration-hub form h2::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: 2px;
+}
+
+.registration-hub form input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: clamp(0.875rem, 2.5vw, 1.125rem);
+  color: var(--text-primary);
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  font-family: inherit;
+  transition: all 0.3s ease;
+  width: 100%;
+  position: relative;
+}
+
+.registration-hub form input:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  background: rgba(0, 255, 163, 0.08);
+  box-shadow: 0 0 0 3px rgba(0, 255, 163, 0.2),
+              0 0 20px rgba(0, 255, 163, 0.3),
+              inset 0 0 20px rgba(0, 255, 163, 0.05);
+  transform: translateY(-2px);
+}
+
+.registration-hub form input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.registration-hub form button {
+  background: var(--gradient-primary);
+  color: #000;
+  border: none;
+  padding: clamp(0.875rem, 2.5vw, 1.125rem) clamp(2rem, 5vw, 3rem);
+  border-radius: var(--radius-lg);
+  font-weight: 900;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  margin-top: clamp(1rem, 3vw, 1.5rem);
+  box-shadow: 0 8px 24px rgba(0, 255, 163, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.registration-hub form button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.registration-hub form button:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0, 255, 163, 0.4);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.registration-hub form button:hover::before {
+  left: 100%;
+}
+
+.registration-hub form button:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+.registration-hub form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 0 4px 12px rgba(0, 255, 163, 0.2);
+}
+
+/* ---------- OPTIONS GRID ---------- */
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  max-width: clamp(320px, 90vw, 1200px);
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 3vw, 2rem);
+}
+
+.option-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  padding: clamp(2rem, 5vw, 3rem);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  position: relative;
+  min-height: clamp(250px, 40vh, 350px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+}
+
+.option-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.option-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(0, 255, 163, 0.1), transparent 50%),
+              radial-gradient(circle at 100% 100%, rgba(138, 43, 226, 0.1), transparent 50%);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.option-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 20px 40px rgba(0, 255, 163, 0.3);
+}
+
+.option-card:hover::before {
+  transform: scaleX(1);
+}
+
+.option-card.active {
+  border: 2px solid var(--neon-cyan);
+  background: rgba(0, 255, 163, 0.1);
+  box-shadow: var(--glow-cyan);
+}
+
+.card-icon {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  margin-bottom: clamp(1rem, 3vw, 1.5rem);
+  display: block;
+  filter: drop-shadow(0 0 20px currentColor);
+  transition: transform 0.3s ease;
+}
+
+.option-card:hover .card-icon {
+  transform: scale(1.1);
+}
+
+.card-title {
+  font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+  font-weight: 800;
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: clamp(1.25rem, 3vw, 1.75rem);
+  font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+.card-cta {
+  background: var(--gradient-primary);
+  color: #000;
+  border: none;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1.25rem, 3vw, 1.75rem);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: auto;
+  min-height: clamp(40px, 6vw, 48px);
+}
+
+.card-cta:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 255, 163, 0.4);
+}
+
+/* ---------- RESPONSIVE DESIGN ---------- */
+@media (max-width: 768px) {
+  .hub-navbar > div {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(0.5rem, 1.5vw, 0.75rem);
+  }
+  
+  .hub-navbar button {
+    padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
+  }
+  
+  .options-grid {
+    grid-template-columns: 1fr;
+    gap: clamp(1.25rem, 3vw, 1.75rem);
+    padding: 0 clamp(0.75rem, 2vw, 1rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .hub-navbar {
+    height: auto;
+    min-height: clamp(60px, 8vw, 80px);
+  }
+  
+  .hub-navbar > * {
+    flex-direction: column;
+    height: auto;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .options-grid {
+    padding: 0 clamp(0.5rem, 1.5vw, 1rem);
+  }
+}
+
+/* ---------- ACCESSIBILITY ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
