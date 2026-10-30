@@ -5,7 +5,7 @@ import "../../styles/login.css";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ emailOrUsername: "", password: "", role: "player" });
+  const [form, setForm] = useState({ emailOrUsername: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -13,7 +13,7 @@ const Login = () => {
   const onChange = (e) => setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
 
   const validate = () => {
-    if (!form.emailOrUsername || !form.password || !form.role) return "Please fill all fields";
+    if (!form.emailOrUsername || !form.password) return "Please fill all fields";
     return "";
   };
 
@@ -29,25 +29,21 @@ const Login = () => {
       const data = await api.post("/auth/login", {
         emailOrUsername: form.emailOrUsername.trim(),
         password: form.password,
-        role: form.role,
       });
 
       // Persist auth and role
       if (data.token) localStorage.setItem("token", data.token);
       if (data.user) {
         localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("userRole", data.user.role);
       }
-      
-      // Store selected role for frontend routing (temporary simulation)
-      localStorage.setItem("userRole", form.role);
+      window.dispatchEvent(new Event("userUpdated"));
       
       setSuccess("Login successful! Redirecting...");
       setTimeout(() => {
         // Role-based redirect logic
-        if (form.role === "admin") {
+        if (data.user?.role === "admin" || data.user?.role === "organizer") {
           navigate("/admin", { replace: true });
-        } else if (form.role === "organizer") {
-          navigate("/admin", { replace: true }); // Can be changed to /conductor later
         } else {
           navigate("/", { replace: true }); // Regular user goes to home
         }
@@ -98,22 +94,6 @@ const Login = () => {
               autoComplete="current-password"
               required
             />
-          </div>
-
-          <div className="login-field">
-            <label htmlFor="role" className="login-label">Role</label>
-            <select
-              id="role"
-              name="role"
-              className="login-input"
-              value={form.role}
-              onChange={onChange}
-              required
-            >
-              <option value="player">Player</option>
-              <option value="organizer">Tournament Organizer</option>
-              <option value="admin">Admin</option>
-            </select>
           </div>
 
           <button type="submit" className="login-button" disabled={loading} aria-busy={loading}>

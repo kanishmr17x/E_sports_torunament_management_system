@@ -1,25 +1,39 @@
 const mongoose = require("mongoose");
 
+let connectionPromise;
+
 const connectDB = async () => {
+    if (mongoose.connection.readyState === 1) {
+        return mongoose.connection;
+    }
+
+    if (connectionPromise) {
+        return connectionPromise;
+    }
+
+    if (!process.env.MONGO_URI) {
+        throw new Error("MONGO_URI is not configured");
+    }
+
+    connectionPromise = mongoose.connect(process.env.MONGO_URI, {
+        dbName: "esportsdb"
+    })
+        .then(() => {
+            mongoose.connection.on('error', (err) => {
+                console.error('❌ MongoDB connection error:', err.message);
+            });
+            return mongoose.connection;
+        })
+        .catch((error) => {
+            connectionPromise = undefined;
+            throw error;
+        });
+
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
-
-        // Handle connection events
-        mongoose.connection.on('error', (err) => {
-            console.error('❌ MongoDB connection error:', err);
-        });
-
-        mongoose.connection.on('disconnected', () => {
-            // MongoDB disconnected
-        });
-
-        mongoose.connection.on('reconnected', () => {
-            // MongoDB reconnected
-        });
-
+        return await connectionPromise;
     } catch (error) {
         console.error("❌ MongoDB connection failed:", error.message);
-        process.exit(1);
+        throw error;
     }
 };
 

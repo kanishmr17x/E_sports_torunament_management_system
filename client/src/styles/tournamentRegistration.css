@@ -1,0 +1,444 @@
+/* Tournament Registration Styles */
+.registration-page {
+    min-height: 100vh;
+    background: var(--bg-primary);
+}
+
+.registration-page.loading,
+.registration-page.error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.spinner-container {
+    text-align: center;
+    padding: 3rem;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top: 4px solid var(--neon-cyan);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.error-card {
+    text-align: center;
+    padding: 3rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    max-width: 400px;
+    color: var(--text-primary);
+}
+
+.error-card h2 {
+    color: var(--danger);
+    margin-bottom: 1rem;
+}
+
+.error-card p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.registration-header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 2rem 0;
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    backdrop-filter: blur(12px);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.tournament-header-info .tournament-game {
+    display: inline-block;
+    font-size: var(--font-xs);
+    padding: 0.25rem 0.75rem;
+    background: rgba(0, 255, 163, 0.15);
+    color: var(--neon-cyan);
+    border-radius: var(--radius-lg);
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.tournament-header-info h1 {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.tournament-subtitle {
+    color: var(--text-secondary);
+    font-size: var(--font-base);
+    margin-bottom: 1rem;
+    max-width: 600px;
+}
+
+.tournament-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: var(--font-sm);
+}
+
+.tournament-meta .entry-fee {
+    color: var(--neon-pink);
+    font-weight: 700;
+    background: rgba(255, 0, 110, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-lg);
+}
+
+.registration-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.registration-container {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+}
+
+.registration-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.detail-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+}
+
+.detail-card h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.detail-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+}
+
+.detail-item label {
+    display: block;
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.detail-item span {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.rules-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.rules-section h3 {
+    font-size: var(--font-base);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.rules-section p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* Teams Selection */
+.teams-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.team-option {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border: 2px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.team-option:hover {
+    border-color: var(--neon-cyan);
+}
+
+.team-option.selected {
+    border-color: var(--neon-cyan);
+    background: rgba(0, 255, 163, 0.05);
+    box-shadow: var(--glow-cyan);
+}
+
+.team-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.team-option-info {
+    flex: 1;
+}
+
+.team-option-info h4 {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.team-option-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+}
+
+.team-option-meta span {
+    background: var(--bg-tertiary);
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-sm);
+}
+
+.radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--glass-border);
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.team-option.selected .radio-custom {
+    border-color: var(--neon-cyan);
+}
+
+.team-option.selected .radio-custom::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: var(--neon-cyan);
+    border-radius: 50%;
+}
+
+.team-option:disabled,
+.team-option input:disabled + .team-option-info {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.no-teams {
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+}
+
+.no-teams p {
+    margin-bottom: 1rem;
+}
+
+/* Registration Sidebar */
+.registration-sidebar {
+    position: sticky;
+    top: 100px;
+}
+
+.registration-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+}
+
+.registration-card h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.registration-summary {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    color: var(--text-secondary);
+}
+
+.summary-row.total {
+    border-top: 1px solid var(--glass-border);
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--text-primary);
+}
+
+.summary-row .fee {
+    color: var(--neon-cyan);
+    font-weight: 700;
+}
+
+.registration-status {
+    margin-bottom: 1.5rem;
+}
+
+.status-warning,
+.status-error,
+.status-success {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-sm);
+    font-weight: 600;
+}
+
+.status-warning {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: var(--warning);
+}
+
+.status-error {
+    background: rgba(255, 59, 59, 0.15);
+    border: 1px solid rgba(255, 59, 59, 0.3);
+    color: var(--danger);
+}
+
+.status-success {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: var(--success);
+}
+
+.register-btn {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.register-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.registration-note {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: var(--font-sm);
+}
+
+.alert-error {
+    background: rgba(255, 59, 59, 0.15);
+    border: 1px solid rgba(255, 59, 59, 0.3);
+    color: var(--danger);
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: var(--success);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .registration-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .registration-sidebar {
+        position: static;
+    }
+    
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-content {
+        padding: 0 1rem;
+    }
+    
+    .registration-main {
+        padding: 1rem;
+    }
+    
+    .tournament-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}

@@ -3,9 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
 const AdminDashboard = () => {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, isOrganizer, loading } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     tournaments: 0,
     teams: 0,
     players: 0,
@@ -13,10 +13,10 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    if (!loading && !isAdmin) {
+    if (!loading && !isAdmin && !isOrganizer) {
       navigate("/unauthorized");
     }
-  }, [isAdmin, loading, navigate]);
+  }, [isAdmin, isOrganizer, loading, navigate]);
 
   const adminCards = [
     {
@@ -99,7 +99,7 @@ const AdminDashboard = () => {
     );
   }
 
-  if (!isAdmin) {
+  if (!isAdmin && !isOrganizer) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
             Access Denied
           </h2>
           <p style={{ color: '#9aa0aa', marginBottom: '32px' }}>
-            You don't have permission to access this page.
+            You don&apos;t have permission to access this page.
           </p>
           <Link 
             to="/" 

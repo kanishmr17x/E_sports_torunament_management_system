@@ -4,12 +4,22 @@ require('dotenv').config();
 
 const createAdmin = async () => {
   try {
+    const { ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_USERNAME = 'admin' } = process.env;
+    if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+      throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be configured');
+    }
+
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/esports-platform');
+    if (!process.env.MONGO_URI) {
+      throw new Error('MONGO_URI must be configured');
+    }
+    await mongoose.connect(process.env.MONGO_URI, {
+      dbName: 'esportsdb'
+    });
     console.log('Connected to MongoDB');
 
     // Check if admin already exists
-    const existingAdmin = await User.findOne({ email: 'admin@esports.com' });
+    const existingAdmin = await User.findOne({ email: ADMIN_EMAIL.toLowerCase().trim() });
     if (existingAdmin) {
       console.log('Admin user already exists');
       process.exit(0);
@@ -17,16 +27,13 @@ const createAdmin = async () => {
 
     // Create admin user
     const admin = await User.create({
-      username: 'admin',
-      email: 'admin@esports.com',
-      password: 'admin123',
+      username: ADMIN_USERNAME.trim(),
+      email: ADMIN_EMAIL.toLowerCase().trim(),
+      password: ADMIN_PASSWORD,
       role: 'admin'
     });
 
-    console.log('Admin user created successfully:');
-    console.log('Email: admin@esports.com');
-    console.log('Password: admin123');
-    console.log('Role:', admin.role);
+    console.log(`Admin user created successfully: ${admin.email}`);
 
     process.exit(0);
   } catch (error) {

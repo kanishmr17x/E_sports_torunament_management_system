@@ -1,0 +1,64 @@
+/* Admin Registrations Styles - Uses adminUsers.css as base */
+/* Additional specific styles for registrations */
+
+.tournament-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.tournament-cell strong {
+    color: var(--text-primary);
+}
+
+.tournament-cell .tournament-game {
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+}
+
+.team-game {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* ConfirmModal with reason input */
+.confirm-modal-content {
+    max-width: 500px;
+}
+
+.confirm-modal-reason {
+    margin-top: 1rem;
+}
+
+.confirm-modal-reason label {
+    display: block;
+    font-weight: 600;
+    color: var(--neon-cyan);
+    font-size: var(--font-sm);
+    margin-bottom: 0.5rem;
+}
+
+.confirm-modal-reason textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: var(--font-base);
+    min-height: 80px;
+    resize: vertical;
+}
+
+.confirm-modal-reason textarea:focus {
+    outline: none;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 0 3px rgba(0, 255, 163, 0.2);
+}

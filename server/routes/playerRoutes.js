@@ -10,15 +10,15 @@ const {
 } = require("../controllers/playerController");
 
 const { protect } = require("../middleware/authMiddleware");
-const { adminOnly } = require("../middleware/adminMiddleware");
+const { staffOnly } = require("../middleware/adminMiddleware");
 
-// Public
+// Public read
 router.get("/", getAllPlayers);
-router.get("/:id", getPlayerById);
 router.get("/team/:teamId", getPlayersByTeam);
-router.post("/add", addPlayer);
+router.get("/:id", getPlayerById);
+router.post("/add", protect, addPlayer);
 
-// Admin only
-router.delete("/:id", protect, adminOnly, deletePlayer);
+// Staff only (admin or organizer)
+router.delete("/:id", protect, staffOnly, deletePlayer);
 
 module.exports = router;

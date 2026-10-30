@@ -19,9 +19,20 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminTournaments from "./pages/Admin/AdminTournaments";
 import AdminTeams from "./pages/Admin/AdminTeams";
 import AdminMatches from "./pages/Admin/AdminMatches";
+import AdminUsers from "./pages/Admin/AdminUsers";
+import AdminRegistrations from "./pages/Admin/AdminRegistrations";
+import AdminPayments from "./pages/Admin/AdminPayments";
 import Unauthorized from "./pages/Unauthorized";
 import UserList from "./pages/Users/UserList";
 import Reports from "./pages/Reports/Reports";
+import UserDashboard from "./pages/Dashboard/UserDashboard";
+import TeamManagement from "./pages/TeamManagement/TeamManagement";
+import TournamentRegistration from "./pages/TournamentRegistration/TournamentRegistration";
+import Payment from "./pages/Payment/Payment";
+import Matches from "./pages/Matches/Matches";
+import Results from "./pages/Results/Results";
+import Leaderboard from "./pages/Leaderboard/Leaderboard";
+import Bracket from "./pages/Bracket/Bracket";
 
 // Global error handler for uncaught promise rejections
 window.addEventListener('unhandledrejection', (event) => {
@@ -48,6 +59,8 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/tournaments" element={<TournamentList />} />
               <Route path="/tournaments/:id" element={<TournamentDetails />} />
+              <Route path="/tournaments/:id/register" element={<TournamentRegistration />} />
+              <Route path="/tournaments/:id/bracket" element={<Bracket />} />
               <Route path="/teams" element={<TeamList />} />
               <Route path="/teams/:id" element={<TeamDetails />} />
               <Route path="/players" element={<PlayerList />} />
@@ -55,6 +68,13 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/register-team" element={<RegisterTeam />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/dashboard" element={<ProtectedRoute><UserDashboard /></ProtectedRoute>} />
+              <Route path="/dashboard/teams" element={<ProtectedRoute><TeamManagement /></ProtectedRoute>} />
+              <Route path="/dashboard/teams/:id/manage" element={<ProtectedRoute><TeamManagement /></ProtectedRoute>} />
+              <Route path="/payment/:id" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+              <Route path="/matches" element={<ProtectedRoute><Matches /></ProtectedRoute>} />
+              <Route path="/results" element={<ProtectedRoute><Results /></ProtectedRoute>} />
+              <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
               <Route path="/admin" element={
               <ProtectedRoute allowedRoles={["admin", "organizer"]}>
                 <AdminDashboard />
@@ -75,9 +95,24 @@ function App() {
                 <AdminMatches />
               </ProtectedRoute>
             } />
-              <Route path="/unauthorized" element={<Unauthorized />} />
-              <Route path="/users" element={<UserList />} />
-              <Route path="/reports" element={<Reports />} />
+            <Route path="/admin/users" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminUsers />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/registrations" element={
+              <ProtectedRoute allowedRoles={["admin", "organizer"]}>
+                <AdminRegistrations />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/payments" element={
+              <ProtectedRoute allowedRoles={["admin", "organizer"]}>
+                <AdminPayments />
+              </ProtectedRoute>
+            } />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="/users" element={<UserList />} />
+            <Route path="/reports" element={<Reports />} />
             </Routes>
           </main>
           <Footer />
