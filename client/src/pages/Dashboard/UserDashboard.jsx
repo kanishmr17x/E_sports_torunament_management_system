@@ -126,7 +126,7 @@ const UserDashboard = () => {
         return tourney && (tourney.status === "registration_open" || tourney.status === "live" || tourney.status === "upcoming");
     }).slice(0, 5);
 
-    const completedRegs = data.registrations.filter(r => {
+    const _completedRegs = data.registrations.filter(r => {
         const tourney = r.tournamentId;
         return tourney && tourney.status === "completed";
     }).slice(0, 5);

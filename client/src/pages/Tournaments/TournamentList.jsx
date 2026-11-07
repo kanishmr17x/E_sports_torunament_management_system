@@ -102,7 +102,7 @@ const TournamentList = () => {
         prizePool: parseFloat(tournamentForm.prizePool) || 0
       };
       
-      const response = await createTournament(tournamentData);
+      await createTournament(tournamentData);
       
       setCreateSuccess(true);
       setTournamentForm({
@@ -164,7 +164,7 @@ const TournamentList = () => {
     }));
   };
 
-  const handleDeleteTournament = async (tournamentId, tournamentName) => {
+  const handleDeleteTournament = async (tournamentId, _tournamentName) => {
     try {
       setDeleting(true);
       

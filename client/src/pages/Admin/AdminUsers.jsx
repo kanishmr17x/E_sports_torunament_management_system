@@ -71,7 +71,7 @@ const AdminUsers = () => {
         }
     };
 
-    const handleDeactivate = async (userId) => {
+    const _handleDeactivate = async (userId) => {
         try {
             await deactivateUser(userId);
             setUsers(prev => prev.map(u => u._id === userId ? { ...u, isActive: false } : u));

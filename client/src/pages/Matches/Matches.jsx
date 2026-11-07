@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUpcomingMatches, getCompletedMatches, getMatchesByTournament } from "../../api/apiRoutes";
+import { getUpcomingMatches, getCompletedMatches } from "../../api/apiRoutes";
 import { useAuth } from "../../hooks/useAuth";
 import "../../styles/theme.css";
 import "../../styles/matches.css";

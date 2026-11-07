@@ -125,7 +125,7 @@ const Bracket = () => {
                             ))}
                         </div>
                         <div className="bracket-rounds">
-                            {sortedRounds.map((round, roundIndex) => (
+                            {sortedRounds.map((round, _roundIndex) => (
                                 <div key={round} className="bracket-round">
                                     {rounds[round].map((match, matchIndex) => (
                                         <div
@@ -197,7 +197,7 @@ const Bracket = () => {
     );
 };
 
-function getRoundName(round, totalRounds, index) {
+function getRoundName(round, totalRounds, _index) {
     const roundNum = parseInt(round);
     if (totalRounds === 1) return "Final";
     if (roundNum === totalRounds) return "Final";

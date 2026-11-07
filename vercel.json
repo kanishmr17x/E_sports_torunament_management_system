@@ -6,17 +6,15 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "destination": "/api"
+    },
+    {
+      "source": "/api",
+      "destination": "/api"
     },
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "env": {
-    "MONGO_URI": "@mongo_uri",
-    "JWT_SECRET": "@jwt_secret",
-    "NODE_ENV": "production",
-    "FRONTEND_URL": "https://e-sportz.vercel.app"
-  }
+  ]
 }

@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const morgan = require("morgan");
+const mongoose = require("mongoose");
 
 const connectDB = require("./config/db");
 const { centralizedErrorHandler } = require("./middleware/centralizedErrorHandler");
@@ -9,7 +10,7 @@ const { centralizedErrorHandler } = require("./middleware/centralizedErrorHandle
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB (non-blocking so the app can start for model registration)
+// Connect to MongoDB (non-blocking for startup)
 connectDB().catch((err) => {
     console.error("❌ Failed to connect to database:", err.message);
 });
@@ -24,8 +25,7 @@ app.set("trust proxy", 1);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// CORS: allow the configured frontend origin(s). Same-origin requests on Vercel
-// do not require CORS, but this keeps local dev and split deploys working.
+// CORS: allow configured frontend origins
 const allowedOrigins = [
     process.env.FRONTEND_URL,
     "http://localhost:5173",
@@ -52,21 +52,19 @@ if (process.env.NODE_ENV !== "production") {
     app.use(morgan("dev"));
 }
 
-// Routes
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/teams", require("./routes/teamRoutes"));
-app.use("/api/players", require("./routes/playerRoutes"));
-app.use("/api/tournaments", require("./routes/tournamentRoutes"));
-app.use("/api/registrations", require("./routes/registrationRoutes"));
-app.use("/api/contact", require("./routes/contactRoutes"));
-app.use("/api/matches", require("./routes/matchRoutes"));
-app.use("/api/payments", require("./routes/paymentRoutes"));
-app.use("/api/notifications", require("./routes/notificationRoutes"));
-app.use("/api/leaderboard", require("./routes/leaderboardRoutes"));
-app.use("/api/admin/users", require("./routes/adminUserRoutes"));
-app.use("/api/admin/registrations", require("./routes/adminRegistrationRoutes"));
+// Health check handler
+const healthHandler = (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "API is healthy",
+        timestamp: new Date().toISOString(),
+        database: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+    });
+};
+app.get("/api/health", healthHandler);
+app.get("/health", healthHandler);
 
-// Root test route
+// Root info route
 app.get("/", (req, res) => {
     res.json({
         message: "E-Sports Tournament API is running...",
@@ -75,13 +73,24 @@ app.get("/", (req, res) => {
     });
 });
 
-// Health check route
-app.get("/api/health", (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: "API is healthy",
-    });
-});
+// API Routers
+const apiRouter = express.Router();
+apiRouter.use("/auth", require("./routes/authRoutes"));
+apiRouter.use("/teams", require("./routes/teamRoutes"));
+apiRouter.use("/players", require("./routes/playerRoutes"));
+apiRouter.use("/tournaments", require("./routes/tournamentRoutes"));
+apiRouter.use("/registrations", require("./routes/registrationRoutes"));
+apiRouter.use("/contact", require("./routes/contactRoutes"));
+apiRouter.use("/matches", require("./routes/matchRoutes"));
+apiRouter.use("/payments", require("./routes/paymentRoutes"));
+apiRouter.use("/notifications", require("./routes/notificationRoutes"));
+apiRouter.use("/leaderboard", require("./routes/leaderboardRoutes"));
+apiRouter.use("/admin/users", require("./routes/adminUserRoutes"));
+apiRouter.use("/admin/registrations", require("./routes/adminRegistrationRoutes"));
+
+// Mount at both /api and root to support standard and rewritten paths on Vercel
+app.use("/api", apiRouter);
+app.use("/", apiRouter);
 
 // 404 handler
 app.use((req, res) => {

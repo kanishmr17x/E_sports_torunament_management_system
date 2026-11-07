@@ -24,7 +24,8 @@ const connectDB = async () => {
     }
 
     connectionPromise = mongoose.connect(process.env.MONGO_URI, {
-        dbName: "esportsdb"
+        dbName: "esportsdb",
+        serverSelectionTimeoutMS: 5000
     })
         .then(() => {
             mongoose.connection.on('error', (err) => {
