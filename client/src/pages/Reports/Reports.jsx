@@ -1,457 +1,195 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { 
+  getTournaments, 
+  getTeams, 
+  getUserStats, 
+  getRegistrationStats, 
+  getPaymentStats 
+} from "../../api/apiRoutes";
+import "../../styles/theme.css";
+import "../../styles/reports.css";
 
 const Reports = () => {
-  const [stats, _setStats] = useState({
-    totalTournaments: 12,
-    totalTeams: 48,
-    totalPlayers: 156,
-    activeUsers: 89,
-    recentRegistrations: 23
+  const [stats, setStats] = useState({
+    totalTournaments: 0,
+    totalTeams: 0,
+    totalUsers: 0,
+    players: 0,
+    organizers: 0,
+    totalRegistrations: 0,
+    totalRevenue: 0
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        const [
+          tournamentsRes,
+          teamsRes,
+          userStatsRes,
+          regStatsRes,
+          payStatsRes
+        ] = await Promise.allSettled([
+          getTournaments(),
+          getTeams(),
+          getUserStats(),
+          getRegistrationStats(),
+          getPaymentStats()
+        ]);
+
+        const totalTournaments = tournamentsRes.status === "fulfilled" && Array.isArray(tournamentsRes.value) ? tournamentsRes.value.length : 0;
+        const totalTeams = teamsRes.status === "fulfilled" && Array.isArray(teamsRes.value) ? teamsRes.value.length : 0;
+        
+        const userData = userStatsRes.status === "fulfilled" ? userStatsRes.value : {};
+        const regData = regStatsRes.status === "fulfilled" ? regStatsRes.value : {};
+        const payData = payStatsRes.status === "fulfilled" ? payStatsRes.value : {};
+
+        setStats({
+          totalTournaments,
+          totalTeams,
+          totalUsers: userData.totalUsers || 0,
+          players: userData.byRole?.players || 0,
+          organizers: userData.byRole?.organizers || 0,
+          totalRegistrations: regData.total || 0,
+          totalRevenue: payData.totalRevenue || 0
+        });
+      } catch (err) {
+        // Fallback gracefully
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
   }, []);
 
-  if (loading) {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <section style={{
-          position: 'relative',
-          padding: '80px 20px 40px',
-          textAlign: 'center',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'linear-gradient(135deg, rgba(255, 0, 150, 0.1) 0%, rgba(0, 150, 255, 0.1) 100%)',
-            zIndex: 1
-          }} />
-          <div style={{
-            position: 'relative',
-            zIndex: 2,
-            maxWidth: '800px',
-            margin: '0 auto'
-          }}>
-            <h1 style={{
-              fontSize: '3.5rem',
-              fontWeight: '800',
-              color: '#fff',
-              marginBottom: '16px',
-              textShadow: '0 0 20px rgba(255, 0, 150, 0.5)'
-            }}>📊 Reports & Analytics</h1>
-            <p style={{
-              fontSize: '1.2rem',
-              color: '#9aa0aa',
-              marginBottom: 0
-            }}>View system statistics and insights.</p>
-          </div>
-        </section>
-
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '200px'
-        }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            border: '4px solid rgba(255, 255, 255, 0.1)',
-            borderTop: '4px solid #00a8ff',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }}></div>
-          <p style={{ color: '#9aa0aa', marginTop: '16px' }}>Loading analytics...</p>
-        </div>
-      </div>
-    );
-  }
+  const totalRoleUsers = (stats.players + stats.organizers) || 1;
+  const playerPercent = Math.round((stats.players / totalRoleUsers) * 100);
+  const organizerPercent = Math.round((stats.organizers / totalRoleUsers) * 100);
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)'
-    }}>
-      <section style={{
-        position: 'relative',
-        padding: '80px 20px 40px',
-        textAlign: 'center',
-        overflow: 'hidden'
-      }}>
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'linear-gradient(135deg, rgba(255, 0, 150, 0.1) 0%, rgba(0, 150, 255, 0.1) 100%)',
-          zIndex: 1
-        }} />
-        <div style={{
-          position: 'relative',
-          zIndex: 2,
-          maxWidth: '800px',
-          margin: '0 auto'
-        }}>
-          <h1 style={{
-            fontSize: '3.5rem',
-            fontWeight: '800',
-            color: '#fff',
-            marginBottom: '16px',
-            textShadow: '0 0 20px rgba(255, 0, 150, 0.5)'
-          }}>📊 Reports & Analytics</h1>
-            <p style={{
-              fontSize: '1.2rem',
-              color: '#9aa0aa',
-              marginBottom: 0
-            }}>View system statistics and insights.</p>
-          </div>
-        </section>
+    <div className="reports-page">
+      {/* Page Header */}
+      <header className="reports-header">
+        <Link to="/admin" className="btn btn-outline btn-sm" style={{ marginBottom: "1rem", display: "inline-flex" }}>
+          ← Back to Admin Console
+        </Link>
+        <h1 className="admin-title">📊 Analytics & Platform Intelligence</h1>
+        <p className="admin-subtitle">
+          Real-time metrics on tournaments, user acquisition, team formations, and platform health.
+        </p>
+      </header>
 
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '40px 20px'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginBottom: '40px',
-          padding: '20px',
-          background: 'rgba(255, 255, 255, 0.05)',
-          borderRadius: '16px',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            fontSize: '1.5rem',
-            fontWeight: '700',
-            color: '#fff'
-          }}>
-            <span style={{ fontSize: '1.8rem' }}>📊</span>
-            System Overview
+      {/* KPI Stats Grid */}
+      <section className="reports-stats-grid">
+        <div className="report-stat-card">
+          <div className="report-stat-icon">🏆</div>
+          <div className="report-stat-value" style={{ color: "var(--neon-cyan)" }}>
+            {loading ? "--" : stats.totalTournaments}
           </div>
+          <div className="report-stat-label">Tournaments Hosted</div>
+          <div className="report-stat-desc">Brackets created across all titles</div>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '24px',
-          marginBottom: '60px'
-        }}>
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '20px',
-            padding: '32px',
-            transition: 'all 0.3s ease',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <div style={{ marginBottom: '16px' }}>
-              <h3 style={{
-                fontSize: '1.4rem',
-                fontWeight: '700',
-                color: '#fff',
-                marginBottom: '8px'
-              }}>🏆 Tournaments</h3>
-              <p style={{
-                fontSize: '1rem',
-                color: '#9aa0aa'
-              }}>Total Events</p>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: '16px',
-              marginBottom: '16px'
-            }}>
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{
-                  fontSize: '2rem',
-                  fontWeight: '700',
-                  color: '#fff'
-                }}>{stats.totalTournaments}</div>
-                <div style={{
-                  fontSize: '0.9rem',
-                  color: '#9aa0aa',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}>Active</div>
-              </div>
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{
-                  fontSize: '2rem',
-                  fontWeight: '700',
-                  color: '#fff'
-                }}>3</div>
-                <div style={{
-                  fontSize: '0.9rem',
-                  color: '#9aa0aa',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}>This Month</div>
-              </div>
-            </div>
-
-            <div style={{
-              fontSize: '1rem',
-              color: '#9aa0aa',
-              textAlign: 'center',
-              marginBottom: '16px'
-            }}>
-              +15% from last month
-            </div>
+        <div className="report-stat-card">
+          <div className="report-stat-icon">👥</div>
+          <div className="report-stat-value" style={{ color: "var(--neon-blue)" }}>
+            {loading ? "--" : stats.totalTeams}
           </div>
-
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '20px',
-            padding: '32px',
-            transition: 'all 0.3s ease',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <div style={{ marginBottom: '16px' }}>
-              <h3 style={{
-                fontSize: '1.4rem',
-                fontWeight: '700',
-                color: '#fff',
-                marginBottom: '8px'
-              }}>👥 Teams</h3>
-              <p style={{
-                fontSize: '1rem',
-                color: '#9aa0aa'
-              }}>Registered</p>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: '16px',
-              marginBottom: '16px'
-            }}>
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{
-                  fontSize: '2rem',
-                  fontWeight: '700',
-                  color: '#fff'
-                }}>{stats.totalTeams}</div>
-                <div style={{
-                  fontSize: '0.9rem',
-                  color: '#9aa0aa',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}>Total</div>
-              </div>
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{
-                  fontSize: '2rem',
-                  fontWeight: '700',
-                  color: '#fff'
-                }}>12</div>
-                <div style={{
-                  fontSize: '0.9rem',
-                  color: '#9aa0aa',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}>New Today</div>
-              </div>
-            </div>
-
-            <div style={{
-              fontSize: '1rem',
-              color: '#9aa0aa',
-              textAlign: 'center',
-              marginBottom: '16px'
-            }}>
-              +8% growth
-            </div>
-          </div>
-
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '20px',
-            padding: '32px',
-            transition: 'all 0.3s ease',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <div style={{ marginBottom: '16px' }}>
-              <h3 style={{
-                fontSize: '1.4rem',
-                fontWeight: '700',
-                color: '#fff',
-                marginBottom: '8px'
-              }}>🎮 Players</h3>
-              <p style={{
-                fontSize: '1rem',
-                color: '#9aa0aa'
-              }}>Active Users</p>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: '16px',
-              marginBottom: '16px'
-            }}>
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{
-                  fontSize: '2rem',
-                  fontWeight: '700',
-                  color: '#fff'
-                }}>{stats.totalPlayers}</div>
-                <div style={{
-                  fontSize: '0.9rem',
-                  color: '#9aa0aa',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}>Registered</div>
-              </div>
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{
-                  fontSize: '2rem',
-                  fontWeight: '700',
-                  color: '#fff'
-                }}>{stats.activeUsers}</div>
-                <div style={{
-                  fontSize: '0.9rem',
-                  color: '#9aa0aa',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}>Active</div>
-              </div>
-            </div>
-
-            <div style={{
-              fontSize: '1rem',
-              color: '#9aa0aa',
-              textAlign: 'center',
-              marginBottom: '16px'
-            }}>
-              57% active rate
-            </div>
-          </div>
-
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '20px',
-            padding: '32px',
-            transition: 'all 0.3s ease',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <div style={{ marginBottom: '16px' }}>
-              <h3 style={{
-                fontSize: '1.4rem',
-                fontWeight: '700',
-                color: '#fff',
-                marginBottom: '8px'
-              }}>📝 Registrations</h3>
-              <p style={{
-                fontSize: '1rem',
-                color: '#9aa0aa'
-              }}>Recent Activity</p>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: '16px',
-              marginBottom: '16px'
-            }}>
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{
-                  fontSize: '2rem',
-                  fontWeight: '700',
-                  color: '#fff'
-                }}>{stats.recentRegistrations}</div>
-                <div style={{
-                  fontSize: '0.9rem',
-                  color: '#9aa0aa',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}>Today</div>
-              </div>
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{
-                  fontSize: '2rem',
-                  fontWeight: '700',
-                  color: '#fff'
-                }}>156</div>
-                <div style={{
-                  fontSize: '0.9rem',
-                  color: '#9aa0aa',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}>This Week</div>
-              </div>
-            </div>
-
-            <div style={{
-              fontSize: '1rem',
-              color: '#9aa0aa',
-              textAlign: 'center',
-              marginBottom: '16px'
-            }}>
-              High activity
-            </div>
-          </div>
+          <div className="report-stat-label">Registered Squads</div>
+          <div className="report-stat-desc">Competitive esports rosters</div>
         </div>
 
-        <div style={{ marginTop: '40px', textAlign: 'center' }}>
-          <h2 style={{
-            color: '#fff',
-            textAlign: 'center',
-            marginBottom: '32px',
-            fontSize: '2rem'
-          }}>
-            📈 Recent Activity
+        <div className="report-stat-card">
+          <div className="report-stat-icon">👤</div>
+          <div className="report-stat-value" style={{ color: "var(--neon-purple)" }}>
+            {loading ? "--" : stats.totalUsers}
+          </div>
+          <div className="report-stat-label">Total Platform Users</div>
+          <div className="report-stat-desc">Athletes, captains & organizers</div>
+        </div>
+
+        <div className="report-stat-card">
+          <div className="report-stat-icon">📝</div>
+          <div className="report-stat-value" style={{ color: "var(--neon-pink)" }}>
+            {loading ? "--" : stats.totalRegistrations}
+          </div>
+          <div className="report-stat-label">Tournament Entries</div>
+          <div className="report-stat-desc">Verified team registrations</div>
+        </div>
+      </section>
+
+      {/* Distribution Breakdown Card */}
+      <section className="reports-chart-card">
+        <div className="reports-chart-header">
+          <h2 className="admin-section-heading" style={{ margin: 0 }}>
+            👥 User Role Distribution
           </h2>
-          <div style={{
-            textAlign: 'center',
-            padding: '60px 40px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '20px',
-            backdropFilter: 'blur(10px)'
-          }}>
-            <div style={{ fontSize: '4rem', marginBottom: '32px', color: '#fff' }}>📊</div>
-            <h3 style={{
-              fontSize: '2rem',
-              fontWeight: '700',
-              color: '#fff',
-              marginBottom: '20px'
-            }}>Analytics Dashboard</h3>
-            <p style={{
-              fontSize: '1.1rem',
-              color: '#9aa0aa',
-              lineHeight: '1.6'
-            }}>
-              Advanced analytics and reporting features coming soon. This will include detailed charts,
-              user engagement metrics, tournament performance data, and more.
-            </p>
+          <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
+            Active Accounts
+          </span>
+        </div>
+
+        <div className="distribution-list">
+          <div className="distribution-item">
+            <div className="distribution-meta">
+              <span>🎮 Players & Athletes ({stats.players})</span>
+              <span style={{ color: "var(--neon-cyan)" }}>{playerPercent}%</span>
+            </div>
+            <div className="distribution-bar-bg">
+              <div
+                className="distribution-bar-fill cyan"
+                style={{ width: `${playerPercent}%` }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="distribution-item">
+            <div className="distribution-meta">
+              <span>🛡️ Tournament Organizers ({stats.organizers})</span>
+              <span style={{ color: "#ffd700" }}>{organizerPercent}%</span>
+            </div>
+            <div className="distribution-bar-bg">
+              <div
+                className="distribution-bar-fill purple"
+                style={{ width: `${organizerPercent}%` }}
+              ></div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Health & Infrastructure Card */}
+      <section className="reports-chart-card">
+        <div className="reports-chart-header">
+          <h2 className="admin-section-heading" style={{ margin: 0 }}>
+            ⚙️ System Health & Infrastructure
+          </h2>
+          <span className="table-badge open">Online</span>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
+          <div>
+            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>API Runtime</span>
+            <div style={{ fontWeight: 700, color: "var(--text-primary)", marginTop: "0.25rem" }}>Node.js / Express</div>
+          </div>
+          <div>
+            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Frontend Framework</span>
+            <div style={{ fontWeight: 700, color: "var(--text-primary)", marginTop: "0.25rem" }}>React 19 / Vite</div>
+          </div>
+          <div>
+            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Data Engine</span>
+            <div style={{ fontWeight: 700, color: "var(--text-primary)", marginTop: "0.25rem" }}>MongoDB / Mongoose</div>
+          </div>
+          <div>
+            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Deployment Target</span>
+            <div style={{ fontWeight: 700, color: "var(--text-primary)", marginTop: "0.25rem" }}>Vercel Full-Stack</div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

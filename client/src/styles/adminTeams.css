@@ -1,0 +1,33 @@
+/* =========================
+   ADMIN TEAMS STYLES
+   ========================= */
+
+.admin-teams-page {
+  min-height: 100vh;
+  padding: clamp(80px, 10vw, 100px) 1.5rem 3rem;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.team-captain-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.captain-crown {
+  color: #ffd700;
+  font-size: 0.9rem;
+}
+
+.team-members-tag {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}

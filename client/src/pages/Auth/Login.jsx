@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../api/axiosConfig";
+import { useAuth } from "../../hooks/useAuth";
 import "../../styles/login.css";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [form, setForm] = useState({ emailOrUsername: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -26,28 +27,17 @@ const Login = () => {
     if (v) { setError(v); return; }
     try {
       setLoading(true);
-      const data = await api.post("/auth/login", {
-        emailOrUsername: form.emailOrUsername.trim(),
-        password: form.password,
-      });
-
-      // Persist auth and role
-      if (data.token) localStorage.setItem("token", data.token);
-      if (data.user) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("userRole", data.user.role);
-      }
-      window.dispatchEvent(new Event("userUpdated"));
+      const data = await login(form.emailOrUsername.trim(), form.password);
       
       setSuccess("Login successful! Redirecting...");
       setTimeout(() => {
         // Role-based redirect logic
-        if (data.user?.role === "admin" || data.user?.role === "organizer") {
+        if (data?.user?.role === "admin" || data?.user?.role === "organizer") {
           navigate("/admin", { replace: true });
         } else {
-          navigate("/", { replace: true }); // Regular user goes to home
+          navigate("/dashboard", { replace: true });
         }
-      }, 1000);
+      }, 800);
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {

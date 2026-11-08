@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../api/axiosConfig";
+import { useAuth } from "../../hooks/useAuth";
 import "../../styles/signup.css";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { signup } = useAuth();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -42,15 +43,15 @@ const Signup = () => {
     if (v) { setError(v); return; }
     try {
       setLoading(true);
-      await api.post("/auth/register", {
-        username: form.username.trim(),
-        email: form.email.trim().toLowerCase(),
-        password: form.password,
-        role: form.role,
-      });
+      await signup(
+        form.username.trim(),
+        form.email.trim().toLowerCase(),
+        form.password,
+        form.role
+      );
       
-      setSuccess("Account created! Redirecting to login...");
-      setTimeout(() => navigate("/login", { replace: true }), 900);
+      setSuccess("Account created successfully! Redirecting...");
+      setTimeout(() => navigate("/dashboard", { replace: true }), 900);
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {

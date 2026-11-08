@@ -28,7 +28,9 @@
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .error-card {
@@ -56,7 +58,7 @@
     border-bottom: 1px solid var(--glass-border);
     padding: 2rem 0;
     position: sticky;
-    top: 0;
+    top: clamp(64px, 8vw, 80px);
     z-index: var(--z-sticky);
     backdrop-filter: blur(12px);
 }
@@ -202,8 +204,15 @@
 }
 
 @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .alert-error {
@@ -266,8 +275,17 @@
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.05); }
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
 }
 
 .pending-state h2 {
@@ -296,7 +314,7 @@
     margin-bottom: 0.5rem;
 }
 
-.payment-form > p {
+.payment-form>p {
     color: var(--text-secondary);
     margin-bottom: 1.5rem;
 }
@@ -401,11 +419,11 @@
     .payment-container {
         grid-template-columns: 1fr;
     }
-    
+
     .payment-action {
         position: static;
     }
-    
+
     .detail-grid {
         grid-template-columns: 1fr;
     }
@@ -417,7 +435,7 @@
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .payment-main {
         padding: 1rem;
     }

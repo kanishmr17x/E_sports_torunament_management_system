@@ -120,3 +120,4 @@ Once deployed, verify the following endpoints:
   cd server
   ADMIN_EMAIL="admin@esports.com" ADMIN_PASSWORD="SecurePassword123" node createAdmin.js
   ```
+

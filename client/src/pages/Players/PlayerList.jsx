@@ -65,8 +65,9 @@ const PlayerList = () => {
           </div>
         </section>
         <div className="teams-container">
-          <div style={{ textAlign: "center", padding: "60px 20px" }}>
-            <p style={{ color: "#9aa0aa" }}>Loading players...</p>
+          <div className="loading-state">
+            <div className="loading-spinner" />
+            <p className="loading-text">Loading esports athletes...</p>
           </div>
         </div>
       </div>
@@ -84,14 +85,15 @@ const PlayerList = () => {
           </div>
         </section>
         <div className="teams-container">
-          <div style={{ textAlign: "center", padding: "60px 20px" }}>
-            <h2 style={{ color: "#ff6b6b" }}>Error Loading Players</h2>
-            <p style={{ color: "#9aa0aa", marginBottom: "20px" }}>{error}</p>
+          <div className="error-state">
+            <div className="error-icon">⚠️</div>
+            <h2 className="error-title">Error Loading Players</h2>
+            <p className="error-text">{error}</p>
             <button 
               onClick={() => window.location.reload()} 
-              className="btn btn-primary"
+              className="retry-btn"
             >
-              Try Again
+              🔄 Try Again
             </button>
           </div>
         </div>
@@ -167,23 +169,17 @@ const PlayerList = () => {
                   <div className="team-card-footer">
                     <Link 
                       to={`/players/${player._id}`} 
-                      className="btn btn-outline"
-                      style={{ width: "100%" }}
+                      className="team-action-btn"
                     >
-                      View Details
+                      👁️ View Details
                     </Link>
                     {isAdmin && (
                       <button
                         onClick={() => openDeleteModal(player._id, player.playerName)}
-                        className="btn btn-primary"
-                        style={{
-                          backgroundColor: '#dc3545',
-                          border: '1px solid #dc3545',
-                          width: "100%",
-                          marginTop: '8px'
-                        }}
+                        className="tournament-action-btn-danger"
+                        style={{ width: "100%", marginTop: "8px", padding: "0.5rem" }}
                       >
-                        🗑️ Delete
+                        🗑️ Delete Athlete
                       </button>
                     )}
                   </div>

@@ -47,10 +47,12 @@ function App() {
         v7_relativeSplatPath: true 
       }}>
         <div className="page-root">
-          {/* Global page background video + overlay (fixed behind entire app) */}
-          <video className="app-bg-video" autoPlay muted loop playsInline aria-hidden="true">
-            <source src="/assets/videos/hero.mp4" type="video/mp4" />
-          </video>
+          {/* Global animated cyber background */}
+          <div className="app-bg-cyber" aria-hidden="true">
+            <div className="cyber-glow cyber-glow-1"></div>
+            <div className="cyber-glow cyber-glow-2"></div>
+            <div className="cyber-grid-overlay"></div>
+          </div>
           <Navbar />
           <main className="page-main">
             <Routes>

@@ -19,6 +19,11 @@ const TournamentList = () => {
   const [deleting, setDeleting] = useState(false);
   const { isAdmin } = useAuth();
 
+  // Search & Filtering State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedGameFilter, setSelectedGameFilter] = useState("all");
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState("all");
+
   // Tournament creation form state
   const [tournamentForm, setTournamentForm] = useState({
     name: "",
@@ -204,6 +209,34 @@ const TournamentList = () => {
     loadTournaments();
   }, []);
 
+  const filteredTournaments = tournaments.filter((tournament) => {
+    const matchesSearch = !searchQuery.trim() ||
+      tournament.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tournament.game?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesGame = selectedGameFilter === "all" ||
+      (tournament.game && tournament.game.toLowerCase() === selectedGameFilter.toLowerCase());
+    const matchesStatus = selectedStatusFilter === "all" ||
+      (tournament.status && tournament.status.toLowerCase() === selectedStatusFilter.toLowerCase());
+    return matchesSearch && matchesGame && matchesStatus;
+  });
+
+  const gameFilterList = [
+    { id: "all", label: "All Games" },
+    { id: "Valorant", label: "Valorant" },
+    { id: "BGMI", label: "BGMI" },
+    { id: "Free Fire", label: "Free Fire" },
+    { id: "COD", label: "COD" },
+    { id: "PUBG", label: "PUBG" }
+  ];
+
+  const statusFilterList = [
+    { id: "all", label: "All Statuses" },
+    { id: "upcoming", label: "Upcoming" },
+    { id: "registration_open", label: "Open" },
+    { id: "ongoing", label: "Ongoing" },
+    { id: "completed", label: "Completed" }
+  ];
+
   if (loading) {
     return (
       <div className="tournament-page">
@@ -262,9 +295,14 @@ const TournamentList = () => {
 
       <div className="tournament-container">
         <div className="tournament-header">
-          <div className="tournament-header-title">
-            <span className="tournament-header-icon">🏆</span>
-            Tournaments
+          <div>
+            <div className="tournament-header-title">
+              <span className="tournament-header-icon">🏆</span>
+              Tournament Arena
+            </div>
+            <p className="tournament-header-sub">
+              {tournaments.length} tournaments active • Find open registrations, brackets, and live standings
+            </p>
           </div>
           <button 
             onClick={() => setShowCreateForm(true)} 
@@ -272,6 +310,56 @@ const TournamentList = () => {
           >
             ➕ Create Tournament
           </button>
+        </div>
+
+        {/* Filter Controls Bar */}
+        <div className="tournament-filter-bar">
+          <div className="tournament-search-box">
+            <span className="search-icon">🔍</span>
+            <input 
+              type="text"
+              placeholder="Search tournaments by name or game..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="tournament-search-input"
+            />
+            {searchQuery && (
+              <button 
+                className="clear-search-btn"
+                onClick={() => setSearchQuery("")}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <div className="filter-pill-groups">
+            <div className="filter-pills-row">
+              <span className="filter-group-label">Game:</span>
+              {gameFilterList.map(g => (
+                <button
+                  key={g.id}
+                  className={`filter-pill ${selectedGameFilter.toLowerCase() === g.id.toLowerCase() ? "active" : ""}`}
+                  onClick={() => setSelectedGameFilter(g.id)}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="filter-pills-row">
+              <span className="filter-group-label">Status:</span>
+              {statusFilterList.map(s => (
+                <button
+                  key={s.id}
+                  className={`filter-pill ${selectedStatusFilter.toLowerCase() === s.id.toLowerCase() ? "active" : ""}`}
+                  onClick={() => setSelectedStatusFilter(s.id)}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         
         {tournaments.length === 0 ? (
@@ -288,78 +376,104 @@ const TournamentList = () => {
               ➕ Create First Tournament
             </button>
           </div>
+        ) : filteredTournaments.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">🔍</div>
+            <h2 className="empty-state-title">No Matching Tournaments</h2>
+            <p className="empty-state-text">
+              No tournaments match your search or filter criteria. Try resetting your filters.
+            </p>
+            <button 
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedGameFilter("all");
+                setSelectedStatusFilter("all");
+              }} 
+              className="create-tournament-btn"
+            >
+              🔄 Reset Filters
+            </button>
+          </div>
         ) : (
           <div className="tournament-grid">
-            {tournaments.map((tournament) => (
-              <div key={tournament._id} className="tournament-card">
-                <div className="tournament-card-header">
-                  <h3 className="tournament-name">{tournament.name}</h3>
-                  <p className="tournament-game">{tournament.game}</p>
-                </div>
+            {filteredTournaments.map((tournament) => {
+              const registered = tournament.registeredTeams || tournament.teams?.length || 0;
+              const max = tournament.maxTeams || 16;
+              const fillPct = Math.min(100, Math.round((registered / max) * 100));
 
-                <div className="tournament-type">
-                  {tournament.type || 'Team'}
-                </div>
-                
-                <div className="tournament-info">
-                  <div className="tournament-info-item">
-                    <span className="tournament-info-label">Max Teams</span>
-                    <span className="tournament-info-value">{tournament.maxTeams}</span>
-                  </div>
-                  <div className="tournament-info-item">
-                    <span className="tournament-info-label">Start Date</span>
-                    <span className="tournament-info-value">
-                      {new Date(tournament.startDate).toLocaleDateString()}
+              return (
+                <div key={tournament._id} className="tournament-card">
+                  <div className="tournament-card-top-bar">
+                    <span className="tournament-game-badge">
+                      {tournament.game || "Esports"}
+                    </span>
+                    <span className={`tournament-status-chip ${tournament.status || "upcoming"}`}>
+                      {tournament.status === "ongoing" && <span className="live-dot" />}
+                      {(tournament.status || "upcoming").replace("_", " ")}
                     </span>
                   </div>
-                  <div className="tournament-info-item">
-                    <span className="tournament-info-label">End Date</span>
-                    <span className="tournament-info-value">
-                      {new Date(tournament.endDate).toLocaleDateString()}
+
+                  <div className="tournament-card-header">
+                    <h3 className="tournament-name">{tournament.name}</h3>
+                    <div className="tournament-type-tag">
+                      Format: {tournament.type || tournament.format || "Team"}
+                    </div>
+                  </div>
+
+                  {/* Prize Highlight */}
+                  <div className="tournament-prize-banner">
+                    <span className="prize-label">PRIZE POOL</span>
+                    <span className="prize-val">
+                      {typeof tournament.prizePool === "number" ? `$${tournament.prizePool.toLocaleString()}` : (tournament.prizePool || "$0")}
                     </span>
                   </div>
-                </div>
 
-                <div className="tournament-stats">
-                  <div className="tournament-stat">
-                    <div className="tournament-stat-value">{tournament.registeredTeams || 0}</div>
-                    <div className="tournament-stat-label">Teams</div>
+                  {/* Slot Progress */}
+                  <div className="tournament-slot-section">
+                    <div className="slot-meta">
+                      <span className="slot-label">Team Slots</span>
+                      <span className="slot-count">{registered} / {max} Filled</span>
+                    </div>
+                    <div className="slot-track">
+                      <div className="slot-fill" style={{ width: `${fillPct}%` }} />
+                    </div>
                   </div>
-                  <div className="tournament-stat">
-                    <div className="tournament-stat-value">{tournament.prizePool || '$0'}</div>
-                    <div className="tournament-stat-label">Prize Pool</div>
+                  
+                  <div className="tournament-info-compact">
+                    <div className="info-compact-item">
+                      <span className="compact-lbl">Starts</span>
+                      <span className="compact-val">
+                        {tournament.startDate ? new Date(tournament.startDate).toLocaleDateString() : "TBD"}
+                      </span>
+                    </div>
+                    <div className="info-compact-item">
+                      <span className="compact-lbl">Ends</span>
+                      <span className="compact-val">
+                        {tournament.endDate ? new Date(tournament.endDate).toLocaleDateString() : "TBD"}
+                      </span>
+                    </div>
                   </div>
-                  <div className="tournament-stat">
-                    <div className="tournament-stat-value">{tournament.duration || '0d'}</div>
-                    <div className="tournament-stat-label">Duration</div>
-                  </div>
-                </div>
 
-                <div className="tournament-status">
-                  {tournament.status || 'upcoming'}
+                  <div className="tournament-actions-group">
+                    <Link to={`/tournaments/${tournament._id}`} className="tournament-action-btn-primary">
+                      👁️ Details
+                    </Link>
+                    <Link to={`/tournaments/${tournament._id}/bracket`} className="tournament-action-btn-secondary">
+                      🏆 Bracket
+                    </Link>
+                    {isAdmin && (
+                      <button
+                        onClick={() => openDeleteModal(tournament._id, tournament.name)}
+                        className="tournament-action-btn-danger"
+                        title="Delete Tournament"
+                      >
+                        🗑️
+                      </button>
+                    )}
+                  </div>
                 </div>
-
-                <div className="tournament-actions">
-                  <Link to={`/tournaments/${tournament._id}`} className="tournament-action-btn">
-                    👁️ View Details
-                  </Link>
-                  {isAdmin && (
-                    <button
-                      onClick={() => openDeleteModal(tournament._id, tournament.name)}
-                      className="tournament-action-btn delete-btn"
-                      style={{
-                        backgroundColor: '#dc3545',
-                        color: '#fff',
-                        border: 'none',
-                        marginLeft: '8px'
-                      }}
-                    >
-                      🗑️ Delete
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
         

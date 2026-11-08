@@ -15,7 +15,6 @@
   max-height: none;
   overflow: hidden;
   background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
-  margin-top: clamp(60px, 8vw, 80px);
   padding: clamp(3rem, 8vw, 6rem) 0;
 }
 

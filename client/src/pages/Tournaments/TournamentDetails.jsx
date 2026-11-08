@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getTournamentById } from "../../api/apiRoutes";
 import "../../styles/theme.css";
+import "../../styles/tournamentDetails.css";
 
 const TournamentDetails = () => {
   const { id } = useParams();
@@ -14,10 +15,8 @@ const TournamentDetails = () => {
       try {
         setLoading(true);
         const response = await getTournamentById(id);
-        
-        // Handle the new response format with success/data structure
-        const tournament = response.success ? response.data : response;
-        setTournament(tournament);
+        const data = response?.success && response.data !== undefined ? response.data : response;
+        setTournament(data);
       } catch (err) {
         setError(err.message || "Failed to fetch tournament");
       } finally {
@@ -29,90 +28,192 @@ const TournamentDetails = () => {
 
   if (loading) {
     return (
-      <div className="container" style={{ textAlign: "center", padding: "60px 20px" }}>
-        <p style={{ color: "#9aa0aa" }}>Loading tournament details...</p>
+      <div className="tournament-details-page">
+        <div className="container" style={{ textAlign: "center", padding: "100px 20px" }}>
+          <div className="admin-spinner" style={{ margin: "0 auto 1.5rem" }}></div>
+          <p style={{ color: "var(--text-secondary)" }}>Loading tournament battleground...</p>
+        </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !tournament) {
     return (
-      <div className="container" style={{ textAlign: "center", padding: "60px 20px" }}>
-        <h2 style={{ color: "#ff6b6b" }}>Tournament Not Found</h2>
-        <p style={{ color: "#9aa0aa", marginBottom: "20px" }}>{error}</p>
-        <Link to="/tournaments" className="btn btn-primary">Back to Tournaments</Link>
+      <div className="tournament-details-page">
+        <div className="container" style={{ textAlign: "center", padding: "100px 20px" }}>
+          <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>⚠️</div>
+          <h2 style={{ color: "var(--danger)", marginBottom: "1rem" }}>Tournament Not Found</h2>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "2rem" }}>
+            {error || `Tournament with ID ${id} was not found.`}
+          </p>
+          <Link to="/tournaments" className="btn btn-primary">
+            ← Back to Tournaments
+          </Link>
+        </div>
       </div>
     );
   }
 
-  if (!tournament) {
-    return (
-      <div className="container" style={{ textAlign: "center", padding: "60px 20px" }}>
-        <h2 style={{ color: "#ff6b6b" }}>Tournament Not Found</h2>
-        <p style={{ color: "#9aa0aa", marginBottom: "20px" }}>Tournament with ID {id} was not found.</p>
-        <Link to="/tournaments" className="btn btn-primary">Back to Tournaments</Link>
-      </div>
-    );
-  }
+  const registeredCount = tournament.teams?.length || tournament.registeredTeams || 0;
+  const maxSlots = tournament.maxTeams || 16;
+  const slotPercent = Math.min(Math.round((registeredCount / maxSlots) * 100), 100);
 
   return (
-    <div>
-      <section className="banner">
-        <div className="banner-overlay" />
-        <div className="banner-content">
-          <h1>{tournament.name}</h1>
-          <p>{tournament.game} Tournament</p>
+    <div className="tournament-details-page">
+      {/* Hero Banner */}
+      <section className="td-hero-banner">
+        <div className="container">
+          <Link to="/tournaments" className="btn btn-outline btn-sm" style={{ marginBottom: "1.5rem", display: "inline-flex" }}>
+            ← All Tournaments
+          </Link>
+
+          <div className="td-hero-content">
+            <div className="td-title-section">
+              <div className="td-tag-row">
+                <span className="td-game-badge">🎮 {tournament.game}</span>
+                <span className="td-type-badge">{tournament.type?.toUpperCase() || "TEAM"}</span>
+                <span className={`table-badge ${tournament.status || "upcoming"}`}>
+                  {tournament.status?.replace(/_/g, " ") || "Upcoming"}
+                </span>
+              </div>
+
+              <h1 className="td-title">{tournament.name}</h1>
+              <p className="td-desc-text">
+                {tournament.description || "Official competitive esports tournament. Compete against verified squads for glory and cash prizes."}
+              </p>
+            </div>
+
+            <div className="td-actions">
+              <Link to={`/tournaments/${tournament._id}/register`} className="btn btn-primary">
+                ⚡ Register Team
+              </Link>
+              <Link to={`/tournaments/${tournament._id}/bracket`} className="btn btn-secondary">
+                🏆 View Bracket
+              </Link>
+              <Link to={`/leaderboard?tournamentId=${tournament._id}`} className="btn btn-outline">
+                📊 Standings
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
+      {/* Main Container */}
       <div className="container">
-        <div className="grid" style={{ marginTop: 24 }}>
-          <div className="card">
-            <h3>Tournament Information</h3>
-            <p><strong>Game:</strong> {tournament.game}</p>
-            <p><strong>Type:</strong> <span className="badge">{tournament.type}</span></p>
-            <p><strong>Status:</strong> <span className={`badge ${tournament.status}`}>{tournament.status}</span></p>
-            <p><strong>Start Date:</strong> {new Date(tournament.startDate).toLocaleDateString()}</p>
-            <p><strong>End Date:</strong> {new Date(tournament.endDate).toLocaleDateString()}</p>
-            <p><strong>Max Teams:</strong> {tournament.maxTeams}</p>
-            <p><strong>Registered Teams:</strong> {tournament.teams ? tournament.teams.length : 0}</p>
-            <p><strong>Prize Pool:</strong> {tournament.prizePool || "$0"}</p>
-            {tournament.description && (
-              <p><strong>Description:</strong> {tournament.description}</p>
+        {/* KPI Metrics */}
+        <section className="td-metrics-grid">
+          <div className="td-metric-card">
+            <span className="td-metric-label">Prize Pool</span>
+            <span className="td-metric-value gold">{tournament.prizePool || "Glory / Trophy"}</span>
+          </div>
+
+          <div className="td-metric-card">
+            <span className="td-metric-label">Team Slots</span>
+            <span className="td-metric-value">
+              {registeredCount} / {maxSlots}
+            </span>
+            <div className="td-progress-bar">
+              <div className="td-progress-fill" style={{ width: `${slotPercent}%` }}></div>
+            </div>
+          </div>
+
+          <div className="td-metric-card">
+            <span className="td-metric-label">Format</span>
+            <span className="td-metric-value" style={{ fontSize: "1.25rem", textTransform: "capitalize" }}>
+              {tournament.format?.replace(/_/g, " ") || "Single Elimination"}
+            </span>
+          </div>
+
+          <div className="td-metric-card">
+            <span className="td-metric-label">Entry Fee</span>
+            <span className="td-metric-value" style={{ color: "var(--neon-cyan)" }}>
+              {tournament.entryFee ? `$${tournament.entryFee}` : "Free Entry"}
+            </span>
+          </div>
+        </section>
+
+        {/* Content Layout */}
+        <div className="td-main-layout">
+          {/* Left Column: Registered Teams & Rules */}
+          <div>
+            <div className="td-card">
+              <h2 className="td-section-heading">👥 Registered Squads ({registeredCount})</h2>
+              {tournament.teams && tournament.teams.length > 0 ? (
+                <div className="td-teams-grid">
+                  {tournament.teams.map(team => (
+                    <div key={team._id || team} className="td-team-item">
+                      <div className="td-team-name">{team.teamName || team.name || "Squad Entry"}</div>
+                      <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>
+                        Game: {team.game || tournament.game}
+                      </div>
+                      {team._id && (
+                        <Link to={`/teams/${team._id}`} className="btn btn-outline btn-sm" style={{ marginTop: "auto" }}>
+                          View Roster →
+                        </Link>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-secondary)" }}>
+                  <p>No teams have confirmed registration yet. Be the first squad to register!</p>
+                  <Link to={`/tournaments/${tournament._id}/register`} className="btn btn-primary btn-sm" style={{ marginTop: "1rem" }}>
+                    Register Squad
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {tournament.rules && (
+              <div className="td-card">
+                <h2 className="td-section-heading">📜 Official Tournament Rules</h2>
+                <div className="td-desc-text" style={{ whiteSpace: "pre-line" }}>
+                  {tournament.rules}
+                </div>
+              </div>
             )}
           </div>
 
-          <div className="card">
-            <h3>Actions</h3>
-            <Link to={`/register?tournamentId=${tournament._id}`} className="btn btn-primary" style={{ marginRight: 8 }}>
-              Register Team
-            </Link>
-            <Link to="/teams" className="btn btn-outline">
-              View Teams
-            </Link>
-          </div>
-        </div>
-
-        {tournament.teams && tournament.teams.length > 0 && (
-          <div className="card" style={{ marginTop: 24 }}>
-            <h3>Registered Teams</h3>
-            <div className="grid">
-              {tournament.teams.map((team) => (
-                <div key={team._id} className="card" style={{ padding: 16 }}>
-                  <h4>{team.teamName}</h4>
-                  <p><strong>Game:</strong> {team.game}</p>
-                  <p><strong>Status:</strong> <span className={`badge ${team.status}`}>{team.status}</span></p>
-                  <Link to={`/teams/${team._id}`} className="btn btn-outline" style={{ marginTop: 8 }}>
-                    View Details
-                  </Link>
+          {/* Right Column: Schedule & Quick Info */}
+          <div>
+            <div className="td-card">
+              <h3 className="td-section-heading" style={{ fontSize: "1.15rem" }}>📅 Schedule Breakdown</h3>
+              <div className="td-info-list">
+                <div className="td-info-row">
+                  <span className="td-info-label">Tournament Start</span>
+                  <span className="td-info-val">
+                    {new Date(tournament.startDate).toLocaleDateString()}
+                  </span>
                 </div>
-              ))}
+                <div className="td-info-row">
+                  <span className="td-info-label">Tournament End</span>
+                  <span className="td-info-val">
+                    {new Date(tournament.endDate).toLocaleDateString()}
+                  </span>
+                </div>
+                {tournament.registrationDeadline && (
+                  <div className="td-info-row">
+                    <span className="td-info-label">Reg. Deadline</span>
+                    <span className="td-info-val">
+                      {new Date(tournament.registrationDeadline).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+                <div className="td-info-row">
+                  <span className="td-info-label">Tournament Mode</span>
+                  <span className="td-info-val" style={{ textTransform: "uppercase" }}>
+                    {tournament.type || "Online"}
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ marginTop: "1.5rem" }}>
+                <Link to={`/tournaments/${tournament._id}/bracket`} className="btn btn-outline btn-full">
+                  Check Bracket Progression
+                </Link>
+              </div>
             </div>
           </div>
-        )}
-
-        <div style={{ marginTop: 24 }}>
-          <Link to="/tournaments" className="btn btn-outline">← Back to Tournaments</Link>
         </div>
       </div>
     </div>

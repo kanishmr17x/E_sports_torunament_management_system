@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getPlayerById } from "../../api/apiRoutes";
 import "../../styles/theme.css";
+import "../../styles/teams.css";
 
 const PlayerDetails = () => {
   const { id } = useParams();
@@ -14,12 +15,10 @@ const PlayerDetails = () => {
       try {
         setLoading(true);
         const response = await getPlayerById(id);
-        
-        // Handle the new response format with success/data structure
-        const player = response.success ? response.data : response;
-        setPlayer(player);
+        const playerData = response.success ? response.data : response;
+        setPlayer(playerData);
       } catch (err) {
-        setError(err.message || "Failed to fetch player");
+        setError(err.message || "Failed to fetch player dossier");
       } finally {
         setLoading(false);
       }
@@ -29,71 +28,112 @@ const PlayerDetails = () => {
 
   if (loading) {
     return (
-      <div className="container" style={{ textAlign: "center", padding: "60px 20px" }}>
-        <p style={{ color: "#9aa0aa" }}>Loading player details...</p>
+      <div className="teams-page">
+        <div className="teams-container">
+          <div className="loading-state">
+            <div className="loading-spinner" />
+            <p className="loading-text">Loading player dossier...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !player) {
     return (
-      <div className="container" style={{ textAlign: "center", padding: "60px 20px" }}>
-        <h2 style={{ color: "#ff6b6b" }}>Player Not Found</h2>
-        <p style={{ color: "#9aa0aa", marginBottom: "20px" }}>{error}</p>
-        <Link to="/teams" className="btn btn-primary">Back to Teams</Link>
+      <div className="teams-page">
+        <div className="teams-container">
+          <div className="error-state">
+            <div className="error-icon">⚠️</div>
+            <h2 className="error-title">Player Not Found</h2>
+            <p className="error-text">{error || `Player with ID ${id} was not found.`}</p>
+            <Link to="/players" className="retry-btn" style={{ textDecoration: "none", display: "inline-block" }}>
+              ← Return to Players
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
 
-  if (!player) {
-    return (
-      <div className="container" style={{ textAlign: "center", padding: "60px 20px" }}>
-        <h2 style={{ color: "#ff6b6b" }}>Player Not Found</h2>
-        <p style={{ color: "#9aa0aa", marginBottom: "20px" }}>Player with ID {id} was not found.</p>
-        <Link to="/teams" className="btn btn-primary">Back to Teams</Link>
-      </div>
-    );
-  }
+  const initial = player.playerName ? player.playerName.charAt(0).toUpperCase() : "P";
 
   return (
-    <div>
-      <section className="banner">
-        <div className="banner-overlay" />
-        <div className="banner-content">
-          <h1>{player.playerName}</h1>
-          <p>{player.gameId || 'Gamer'}</p>
+    <div className="player-details-page">
+      <section className="teams-banner">
+        <div className="teams-banner-overlay" />
+        <div className="teams-banner-content">
+          <h1 className="teams-banner-title">{player.playerName}</h1>
+          <p className="teams-banner-subtitle">Esports Athlete Dossier</p>
         </div>
       </section>
 
-      <div className="container">
-        <div className="grid" style={{ marginTop: 24 }}>
-          <div className="card">
-            <h3>Player Information</h3>
-            <p><strong>Name:</strong> {player.playerName}</p>
-            <p><strong>Contact:</strong> {player.contact}</p>
-            <p><strong>Game:</strong> {player.gameId || 'Not specified'}</p>
-            <p><strong>Role:</strong> <span className="badge">{player.role || 'Other'}</span></p>
-            <p><strong>Age:</strong> {player.age || 'Not specified'}</p>
-            <p><strong>Joined:</strong> {new Date(player.createdAt).toLocaleDateString()}</p>
-            
-            {player.teamId && (
-              <p><strong>Team:</strong> {player.teamId.teamName || 'No team assigned'}</p>
-            )}
+      <div className="team-details-container">
+        {/* Player Profile Card */}
+        <div className="team-hero-card">
+          <div className="team-hero-header">
+            <div className="team-avatar-large">
+              {initial}
+            </div>
+
+            <div className="team-hero-info">
+              <span className="team-game-tag">🎮 {player.gameId || "Competitive Esports"}</span>
+              <h2 className="team-hero-title">{player.playerName}</h2>
+              <div className="team-meta-pills">
+                <span className="player-role-chip" style={{ fontSize: "0.8rem", padding: "0.25rem 0.75rem" }}>
+                  Role: {player.role || "Competitor"}
+                </span>
+                <span className="compact-lbl">
+                  Joined: {player.createdAt ? new Date(player.createdAt).toLocaleDateString() : "Recently"}
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="card">
-            <h3>Actions</h3>
-            <Link to={`/register?playerId=${player._id}`} className="btn btn-primary" style={{ marginRight: 8 }}>
-              Register Player
-            </Link>
-            <Link to="/teams" className="btn btn-outline">
-              View Teams
-            </Link>
+          <div className="team-stats-strip">
+            <div className="team-stat-item">
+              <div className="team-stat-num">{player.age || "—"}</div>
+              <div className="team-stat-lbl">Player Age</div>
+            </div>
+            <div className="team-stat-item">
+              <div className="team-stat-num">{player.contact ? "Active" : "—"}</div>
+              <div className="team-stat-lbl">Communication</div>
+            </div>
+            <div className="team-stat-item">
+              <div className="team-stat-num">
+                {player.teamId ? (typeof player.teamId === "object" ? player.teamId.teamName : "Assigned") : "Free Agent"}
+              </div>
+              <div className="team-stat-lbl">Squad Status</div>
+            </div>
           </div>
         </div>
 
-        <div style={{ marginTop: 24 }}>
-          <Link to="/teams" className="btn btn-outline">← Back to Teams</Link>
+        {/* Assigned Team Card */}
+        {player.teamId && typeof player.teamId === "object" && (
+          <div className="team-roster-section" style={{ marginBottom: "2rem" }}>
+            <div className="section-head">
+              <h2>🛡️ Assigned Squad</h2>
+              <Link to={`/teams/${player.teamId._id}`} className="roster-player-link">
+                View Team Profile →
+              </Link>
+            </div>
+            <p style={{ color: "var(--text-secondary)", margin: 0 }}>
+              This athlete competes under <strong>{player.teamId.teamName}</strong> in <strong>{player.teamId.game || player.gameId || "tournaments"}</strong>.
+            </p>
+          </div>
+        )}
+
+        {/* Action Row */}
+        <div className="team-action-bar">
+          <Link to={`/register?playerId=${player._id}`} className="tournament-action-btn-primary" style={{ padding: "0.85rem 1.75rem" }}>
+            ⚡ Register in Tournament
+          </Link>
+          <Link to="/players" className="tournament-action-btn-secondary" style={{ padding: "0.85rem 1.75rem" }}>
+            ← All Players
+          </Link>
+          <Link to="/teams" className="tournament-action-btn-secondary" style={{ padding: "0.85rem 1.75rem" }}>
+            👥 Browse Teams
+          </Link>
         </div>
       </div>
     </div>
