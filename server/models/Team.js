@@ -29,10 +29,17 @@ const teamSchema = new mongoose.Schema({
         ref: 'Tournament',
         required: true
     },
+    captain: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     isDeleted: {
         type: Boolean,
         default: false
     }
 }, { timestamps: true });
+
+teamSchema.index({ tournament: 1, teamName: 1 }, { unique: true });
 
 module.exports = mongoose.model("Team", teamSchema);

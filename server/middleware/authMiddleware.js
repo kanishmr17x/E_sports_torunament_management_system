@@ -2,12 +2,12 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { sendResponse, errorResponse } = require("./centralizedErrorHandler");
 
+// Authentication middleware: verifies JWT and attaches the user to req.user
 exports.protect = async (req, res, next) => {
     let token;
 
-    // Check Authorization header (case insensitive)
     const authHeader = req.headers.authorization || req.headers.Authorization;
-    
+
     if (authHeader && authHeader.startsWith("Bearer")) {
         token = authHeader.split(" ")[1];
     }
@@ -25,20 +25,12 @@ exports.protect = async (req, res, next) => {
             return sendResponse(res, errorResponse("User not found", 401));
         }
 
+        if (!req.user.isActive) {
+            return sendResponse(res, errorResponse("User account is inactive", 403));
+        }
+
         next();
     } catch (error) {
         return sendResponse(res, errorResponse("Token invalid or expired", 401));
     }
-};
-
-// Admin-only middleware
-exports.adminOnly = async (req, res, next) => {
-    // First ensure user is authenticated
-    await exports.protect(req, res, () => {
-        if (req.user && req.user.role === 'admin') {
-            next();
-        } else {
-            return sendResponse(res, errorResponse("Admin access required", 403));
-        }
-    });
 };

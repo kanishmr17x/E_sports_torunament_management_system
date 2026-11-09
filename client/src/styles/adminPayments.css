@@ -1,0 +1,61 @@
+/* Admin Payments Styles - Uses adminUsers.css as base */
+/* Additional specific styles for payments */
+
+.txn-id {
+    font-family: monospace;
+    font-size: var(--font-sm);
+    background: var(--bg-tertiary);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+}
+
+.amount-cell {
+    font-weight: 700;
+    color: var(--neon-cyan);
+    font-family: monospace;
+}
+
+.payment-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-lg);
+    font-size: var(--font-xs);
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.payment-status.paid { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+.payment-status.pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+.payment-status.processing { background: rgba(0, 212, 255, 0.2); color: var(--neon-blue); }
+.payment-status.failed { background: rgba(255, 59, 59, 0.2); color: var(--danger); }
+.payment-status.cancelled { background: rgba(107, 114, 128, 0.2); color: var(--text-muted); }
+.payment-status.refunded { background: rgba(138, 43, 226, 0.2); color: var(--neon-purple); }
+
+.confirm-modal-reason {
+    margin-top: 1rem;
+}
+
+.confirm-modal-reason label {
+    display: block;
+    font-weight: 600;
+    color: var(--neon-cyan);
+    font-size: var(--font-sm);
+    margin-bottom: 0.5rem;
+}
+
+.confirm-modal-reason textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: var(--font-base);
+    min-height: 80px;
+    resize: vertical;
+}
+
+.confirm-modal-reason textarea:focus {
+    outline: none;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 0 3px rgba(0, 255, 163, 0.2);
+}

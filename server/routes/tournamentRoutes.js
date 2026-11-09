@@ -6,19 +6,21 @@ const {
     getAllTournaments,
     getTournamentById,
     updateTournament,
-    deleteTournament
+    deleteTournament,
+    getOpenRegistrations
 } = require("../controllers/tournamentController");
 
 const { protect } = require("../middleware/authMiddleware");
-const { adminOnly } = require("../middleware/adminMiddleware");
+const { staffOnly } = require("../middleware/adminMiddleware");
 
-// Public
-router.post("/", createTournament);
+// Public read
 router.get("/", getAllTournaments);
+router.get("/open-registrations", getOpenRegistrations);
 router.get("/:id", getTournamentById);
 
-// Admin only
-router.put("/:id", protect, adminOnly, updateTournament);
-router.delete("/:id", protect, adminOnly, deleteTournament);
+// Staff only (admin or organizer)
+router.post("/", protect, staffOnly, createTournament);
+router.put("/:id", protect, staffOnly, updateTournament);
+router.delete("/:id", protect, staffOnly, deleteTournament);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getTournaments, registerTeam, getTeams, createTeam, addPlayer } from "../../api/apiRoutes";
+import { getTournaments, getTeams, createTeam, addPlayer } from "../../api/apiRoutes";
 import "../../styles/theme.css";
 import "../../styles/tournament.css";
 
@@ -137,7 +137,7 @@ const Register = () => {
     setSuccess("");
 
     try {
-      const response = await addPlayer({
+      await addPlayer({
         playerName: playerForm.name.trim(),
         playerEmail: playerForm.email.trim(),
         gameId: teams.find(t => t._id === selectedTeam)?.game || playerForm.gameId || "Other",

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import "../styles/confirmModal.css";
 
 const ConfirmModal = ({ 
   isOpen, 
@@ -6,100 +7,59 @@ const ConfirmModal = ({
   onConfirm, 
   title = "Confirm Delete", 
   message = "Are you sure you want to delete this? This action can be undone.",
-  isLoading = false 
+  isLoading = false,
+  showReasonInput = false,
+  _onReasonChange = () => {}
 }) => {
+  const [reason, setReason] = useState("");
+
   if (!isOpen) return null;
 
+  const handleConfirm = () => {
+    if (showReasonInput) {
+      onConfirm(reason);
+    } else {
+      onConfirm();
+    }
+  };
+
   return (
-    <div 
-      className="modal-overlay" 
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000
-      }}
-      onClick={onClose}
-    >
-      <div 
-        className="modal-content"
-        style={{
-          backgroundColor: '#1a1a1a',
-          border: '1px solid #333',
-          borderRadius: '8px',
-          padding: '24px',
-          maxWidth: '400px',
-          width: '90%',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 
-          style={{
-            color: '#fff',
-            margin: '0 0 16px 0',
-            fontSize: '18px',
-            fontWeight: '600'
-          }}
-        >
-          {title}
-        </h3>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3>{title}</h3>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
         
-        <p 
-          style={{
-            color: '#9aa0aa',
-            margin: '0 0 24px 0',
-            lineHeight: '1.5'
-          }}
-        >
-          {message}
-        </p>
+        <p className="modal-message">{message}</p>
         
-        <div 
-          style={{
-            display: 'flex',
-            gap: '12px',
-            justifyContent: 'flex-end'
-          }}
-        >
+        {showReasonInput && (
+          <div className="confirm-modal-reason">
+            <label>Reason (required)</label>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Enter reason..."
+              rows="3"
+            />
+          </div>
+        )}
+        
+        <div className="modal-actions">
           <button
             onClick={onClose}
             disabled={isLoading}
             className="btn btn-outline"
-            style={{
-              padding: '8px 16px',
-              border: '1px solid #444',
-              backgroundColor: 'transparent',
-              color: '#9aa0aa',
-              borderRadius: '4px',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              opacity: isLoading ? 0.6 : 1
-            }}
           >
             Cancel
           </button>
           
           <button
-            onClick={onConfirm}
-            disabled={isLoading}
-            className="btn btn-primary"
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#dc3545',
-              border: '1px solid #dc3545',
-              color: '#fff',
-              borderRadius: '4px',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              opacity: isLoading ? 0.6 : 1
-            }}
+            onClick={handleConfirm}
+            disabled={isLoading || (showReasonInput && !reason.trim())}
+            className="btn btn-danger"
           >
-            {isLoading ? 'Deleting...' : 'Delete'}
+            {isLoading ? 'Processing...' : 'Confirm'}
           </button>
         </div>
       </div>

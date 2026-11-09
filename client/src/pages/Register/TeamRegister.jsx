@@ -45,7 +45,7 @@ const TeamRegister = () => {
     }
 
     try {
-      const response = await registerTeam({ 
+      await registerTeam({ 
         teamId: teamId.trim(),
         tournamentId: tournamentId.trim()
       });

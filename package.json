@@ -1,5 +1,21 @@
 {
+  "name": "esports-tournament-management-system",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd client && npm run build",
+    "lint": "cd client && npm run lint",
+    "start": "node server/server.js"
+  },
   "dependencies": {
-    "mongodb": "^7.0.0"
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^7.7.0",
+    "mongoose": "^8.24.5",
+    "morgan": "^1.10.0",
+    "uuid": "^9.0.0"
   }
 }

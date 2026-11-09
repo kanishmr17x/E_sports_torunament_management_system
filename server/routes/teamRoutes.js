@@ -4,24 +4,27 @@ const router = express.Router();
 const {
     createTeam,
     getAllTeams,
+    getMyTeams,
     getTeamById,
     updateTeam,
     deleteTeam
 } = require("../controllers/teamController");
 
 const { protect } = require("../middleware/authMiddleware");
-const { adminOnly } = require("../middleware/adminMiddleware");
+const { staffOnly } = require("../middleware/adminMiddleware");
 
-// Public
+// Public read
 router.get("/", getAllTeams);
+
+// User's own teams
+router.get("/my-teams", protect, getMyTeams);
 router.get("/:id", getTeamById);
 
-// Team creation - public for now (can add auth later)
-router.post("/", createTeam);
+// Team creation (requires login)
+router.post("/", protect, createTeam);
 
-// Admin only
-router.post("/create", protect, adminOnly, createTeam);
-router.put("/:id", protect, adminOnly, updateTeam);
-router.delete("/:id", protect, adminOnly, deleteTeam);
+// Team owner or admin
+router.put("/:id", protect, updateTeam);
+router.delete("/:id", protect, deleteTeam);
 
 module.exports = router;

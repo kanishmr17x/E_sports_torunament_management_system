@@ -31,7 +31,7 @@ const RegisterTeam = () => {
     return true;
   };
 
-  const apiRequest = async (url, body, auth = true) => {
+  const apiRequest = async (url, body) => {
     resetStatus();
     try {
       setStatus(s => ({ ...s, loading: true }));
@@ -40,10 +40,6 @@ const RegisterTeam = () => {
       
       setStatus(s => ({ ...s, loading: false }));
       
-      // Handle new response format with success/data structure
-      if (response.data) {
-        return response.data;
-      }
       return response;
     } catch (err) {
       // Handle different types of errors
@@ -86,14 +82,14 @@ const RegisterTeam = () => {
       return;
     }
     
-    const result = await api.post("/auth/register", {
+    const result = await apiRequest("/auth/register", {
       username: f.playerName.trim(),
       email: f.playerEmail.toLowerCase(),
       password: f.playerPassword,
       role: "player"
     });
     
-    if (result.success || result.data) {
+    if (result && result.success !== false) {
       setForms({ ...forms, player: initialStates.player });
       setStatus({ loading: false, error: "", success: "Player registered successfully!" });
     }
@@ -127,13 +123,13 @@ const submitTeam = async e => {
       return;
     }
     
-    const result = await api.post("/api/teams", {
+    const result = await apiRequest("/teams", {
       teamName: f.name.trim(),
       game: f.game.trim(),
       tournamentId: f.tournamentId.trim()
     });
     
-    if (result.success || result.data) {
+    if (result && result.success !== false) {
       setForms({ ...forms, team: initialStates.team });
       setStatus({ loading: false, error: "", success: "Team created successfully!" });
     }
@@ -148,8 +144,8 @@ const submitTeam = async e => {
       setStatus({ loading: false, error: "Fill all required fields.", success: "" });
       return;
     }
-    const result = await api.post("/api/tournaments", { ...f, maxTeams: Number(f.maxTeams) });
-    if (result.success || result.data) {
+    const result = await apiRequest("/tournaments", { ...f, maxTeams: Number(f.maxTeams) });
+    if (result && result.success !== false) {
       setForms({ ...forms, tournament: initialStates.tournament });
       setStatus({ loading: false, error: "", success: "Tournament created successfully!" });
     }
@@ -163,8 +159,8 @@ const submitTeam = async e => {
       setStatus({ loading: false, error: "Both IDs required.", success: "" });
       return;
     }
-    const result = await apiRequest("/api/registrations/team", f, true);
-    if (result.success || result.data) {
+    const result = await apiRequest("/registrations/team", f);
+    if (result && result.success !== false) {
       setForms({ ...forms, register: initialStates.register });
       setStatus({ loading: false, error: "", success: "Team registered to tournament!" });
     }

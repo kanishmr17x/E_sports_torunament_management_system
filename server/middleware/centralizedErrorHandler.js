@@ -1,5 +1,20 @@
 const mongoose = require('mongoose');
 
+const redactSensitiveFields = (value) => {
+    if (!value || typeof value !== 'object') return value;
+    const sensitiveFields = new Set([
+        'password', 'token', 'authorization', 'gatewayresponse',
+        'accesstoken', 'refreshtoken', 'secret'
+    ]);
+    const redacted = {};
+    Object.entries(value).forEach(([key, fieldValue]) => {
+        redacted[key] = sensitiveFields.has(key.toLowerCase())
+            ? '[REDACTED]'
+            : fieldValue;
+    });
+    return redacted;
+};
+
 // Centralized Error Handler Middleware
 const centralizedErrorHandler = (err, req, res, next) => {
     console.error('Error occurred:', {
@@ -7,9 +22,8 @@ const centralizedErrorHandler = (err, req, res, next) => {
         stack: err.stack,
         url: req.url,
         method: req.method,
-        body: req.body,
-        params: req.params,
-        query: req.query
+        params: redactSensitiveFields(req.params),
+        query: redactSensitiveFields(req.query)
     });
 
     let error = { ...err };

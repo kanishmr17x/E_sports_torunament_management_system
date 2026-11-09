@@ -15,7 +15,7 @@ const TeamList = () => {
   const [deleting, setDeleting] = useState(false);
   const { isAdmin } = useAuth();
 
-  const handleDeleteTeam = async (teamId, teamName) => {
+  const handleDeleteTeam = async (teamId, _teamName) => {
     try {
       setDeleting(true);
       

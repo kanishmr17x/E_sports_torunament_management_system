@@ -4,9 +4,10 @@ const Player = require("../models/Player");
 const mongoose = require("mongoose");
 const { asyncHandler, validateRequired, validateObjectId, errorResponse, successResponse, sendResponse } = require("../middleware/centralizedErrorHandler");
 
-// Create Team
+// Create Team (requires authentication)
 exports.createTeam = asyncHandler(async (req, res) => {
     const { teamName, game, status, tournamentId } = req.body;
+    const captainId = req.user._id;
 
     // Strict validation
     const validation = validateRequired(['teamName', 'game', 'tournamentId'], req.body);
@@ -42,12 +43,19 @@ exports.createTeam = asyncHandler(async (req, res) => {
             return sendResponse(res, errorResponse("Tournament is full. Maximum teams reached.", 409));
         }
 
-        // Create team with tournament reference
+        // Check if user already has a team in this tournament
+        const existingTeam = await Team.findOne({ captain: captainId, tournament: tournamentId, isDeleted: false });
+        if (existingTeam) {
+            return sendResponse(res, errorResponse("You already have a team in this tournament", 409));
+        }
+
+        // Create team with tournament reference and captain
         const team = await Team.create({
             teamName: teamName.trim(),
             game: game.trim(),
             status: status || "current",
-            tournament: tournamentId
+            tournament: tournamentId,
+            captain: captainId
         });
 
         // Add team to tournament's teams array
@@ -56,17 +64,33 @@ exports.createTeam = asyncHandler(async (req, res) => {
 
         // Populate tournament for response
         await team.populate('tournament');
+        await team.populate('captain', 'username email');
         
         sendResponse(res, successResponse("Team created successfully", team, 201));
 
     } catch (error) {
+        if (error.code === 11000) {
+            return sendResponse(res, errorResponse("Team name already exists in this tournament", 409));
+        }
         throw error;
     }
 });
 
 // Get All Teams
 exports.getAllTeams = asyncHandler(async (req, res) => {
-    const teams = await Team.find({ isDeleted: false }).sort({ createdAt: -1 }).populate('tournament');
+    const teams = await Team.find({ isDeleted: false })
+        .sort({ createdAt: -1 })
+        .populate('tournament', 'name game')
+        .populate('captain', 'username email');
+    
+    sendResponse(res, successResponse(`Found ${teams.length} teams`, teams));
+});
+
+// Get My Teams (for logged in user)
+exports.getMyTeams = asyncHandler(async (req, res) => {
+    const teams = await Team.find({ captain: req.user._id, isDeleted: false })
+        .sort({ createdAt: -1 })
+        .populate('tournament', 'name game status startDate endDate');
     
     sendResponse(res, successResponse(`Found ${teams.length} teams`, teams));
 });
@@ -78,7 +102,9 @@ exports.getTeamById = asyncHandler(async (req, res) => {
         return sendResponse(res, errorResponse("Invalid team ID format", 400));
     }
     
-    const team = await Team.findOne({ _id: req.params.id, isDeleted: false }).populate('tournament');
+    const team = await Team.findOne({ _id: req.params.id, isDeleted: false })
+        .populate('tournament', 'name game status startDate endDate')
+        .populate('captain', 'username email');
     
     if (!team) {
         return sendResponse(res, errorResponse("Team not found", 404));
@@ -96,27 +122,45 @@ exports.getTeamById = asyncHandler(async (req, res) => {
     sendResponse(res, successResponse("Team found", teamWithPlayers));
 });
 
-// Update Team
+// Update Team (only captain or admin)
 exports.updateTeam = asyncHandler(async (req, res) => {
     // Validate ObjectId
     if (!validateObjectId(req.params.id)) {
         return sendResponse(res, errorResponse("Invalid team ID format", 400));
     }
     
-    const team = await Team.findOneAndUpdate(
-        { _id: req.params.id, isDeleted: false },
-        req.body,
-        { new: true, runValidators: true }
-    ).populate('tournament');
-    
+    const team = await Team.findOne({ _id: req.params.id, isDeleted: false });
     if (!team) {
         return sendResponse(res, errorResponse("Team not found", 404));
     }
+
+    // Check ownership
+    const isCaptain = team.captain.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === "admin";
     
-    sendResponse(res, successResponse("Team updated successfully", team));
+    if (!isCaptain && !isAdmin) {
+        return sendResponse(res, errorResponse("Not authorized to update this team", 403));
+    }
+
+    const allowedFields = ["teamName", "game", "status", "totalMembers", "logo"];
+    if (isAdmin) allowedFields.push("captain");
+    const updates = Object.fromEntries(
+        allowedFields
+            .filter((field) => Object.prototype.hasOwnProperty.call(req.body, field))
+            .map((field) => [field, req.body[field]])
+    );
+
+    const updatedTeam = await Team.findOneAndUpdate(
+        { _id: req.params.id, isDeleted: false },
+        updates,
+        { new: true, runValidators: true }
+    ).populate('tournament', 'name game')
+     .populate('captain', 'username email');
+    
+    sendResponse(res, successResponse("Team updated successfully", updatedTeam));
 });
 
-// Soft Delete Team with Admin Validation
+// Soft Delete Team (only captain or admin)
 exports.deleteTeam = asyncHandler(async (req, res) => {
     // Validate ObjectId
     if (!validateObjectId(req.params.id)) {
@@ -130,13 +174,27 @@ exports.deleteTeam = asyncHandler(async (req, res) => {
             return sendResponse(res, errorResponse("Team not found or already deleted", 404));
         }
 
+        // Check ownership
+        const isCaptain = team.captain.toString() === req.user._id.toString();
+        const isAdmin = req.user.role === "admin";
+        
+        if (!isCaptain && !isAdmin) {
+            return sendResponse(res, errorResponse("Not authorized to delete this team", 403));
+        }
+
         // Soft delete the team
         const updatedTeam = await Team.findByIdAndUpdate(
             req.params.id,
             { isDeleted: true },
             { new: true, runValidators: true }
-        ).populate('tournament');
+        ).populate('tournament', 'name game')
+         .populate('captain', 'username email');
         
+        // Remove from tournament teams array
+        await Tournament.findByIdAndUpdate(team.tournament, {
+            $pull: { teams: team._id }
+        });
+
         sendResponse(res, successResponse("Team deleted successfully", updatedTeam));
 
     } catch (error) {

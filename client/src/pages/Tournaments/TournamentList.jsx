@@ -102,7 +102,7 @@ const TournamentList = () => {
         prizePool: parseFloat(tournamentForm.prizePool) || 0
       };
       
-      const response = await createTournament(tournamentData);
+      await createTournament(tournamentData);
       
       setCreateSuccess(true);
       setTournamentForm({
@@ -118,7 +118,7 @@ const TournamentList = () => {
       setShowCreateForm(false);
       
       // Refresh tournaments list
-      fetchData();
+      loadTournaments();
       
       // Clear success message after 3 seconds
       setTimeout(() => setCreateSuccess(false), 3000);
@@ -164,7 +164,7 @@ const TournamentList = () => {
     }));
   };
 
-  const handleDeleteTournament = async (tournamentId, tournamentName) => {
+  const handleDeleteTournament = async (tournamentId, _tournamentName) => {
     try {
       setDeleting(true);
       
@@ -188,22 +188,20 @@ const TournamentList = () => {
     setDeleteModal({ isOpen: false, tournamentId: null, tournamentName: "" });
   };
 
+  const loadTournaments = async () => {
+    try {
+      setLoading(true);
+      const tournamentsData = await getTournaments();
+      setTournaments(Array.isArray(tournamentsData) ? tournamentsData : []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const tournamentsData = await getTournaments();
-        
-        // Handle the response format (axios interceptor already extracts data)
-        const tournaments = Array.isArray(tournamentsData) ? tournamentsData : [];
-        setTournaments(tournaments);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    loadTournaments();
   }, []);
 
   if (loading) {

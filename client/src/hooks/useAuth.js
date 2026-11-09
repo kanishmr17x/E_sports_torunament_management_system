@@ -12,7 +12,7 @@ export const useAuth = () => {
           const userData = JSON.parse(userStr);
           setUser(userData);
         }
-      } catch (error) {
+      } catch {
         localStorage.removeItem('user');
       } finally {
         setLoading(false);
@@ -39,11 +39,20 @@ export const useAuth = () => {
   const isOrganizer = user?.role === 'organizer';
   const isAuthenticated = !!user;
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userRole');
+    setUser(null);
+    window.dispatchEvent(new Event('userUpdated'));
+  };
+
   return {
     user,
     loading,
     isAuthenticated,
     isAdmin,
-    isOrganizer
+    isOrganizer,
+    logout
   };
 };

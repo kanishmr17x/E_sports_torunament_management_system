@@ -34,8 +34,10 @@ exports.registerUser = asyncHandler(async (req, res) => {
         return sendResponse(res, errorResponse("Username must be at least 3 characters", 400));
     }
 
-    // Validate role
-    const validRoles = ["player", "admin", "organizer"];
+    // Validate role: only player and organizer can self-register.
+    // The "admin" role can only be assigned via the seed script (createAdmin.js)
+    // to prevent privilege escalation through the public registration endpoint.
+    const validRoles = ["player", "organizer"];
     if (role && !validRoles.includes(role)) {
         return sendResponse(res, errorResponse("Invalid role. Must be one of: " + validRoles.join(", "), 400));
     }
