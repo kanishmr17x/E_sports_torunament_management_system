@@ -42,7 +42,7 @@ const Signup = () => {
     if (v) { setError(v); return; }
     try {
       setLoading(true);
-      const data = await api.post("/auth/register", {
+      await api.post("/auth/register", {
         username: form.username.trim(),
         email: form.email.trim().toLowerCase(),
         password: form.password,

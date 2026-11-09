@@ -15,7 +15,7 @@ const PlayerList = () => {
   const [deleting, setDeleting] = useState(false);
   const { isAdmin } = useAuth();
 
-  const handleDeletePlayer = async (playerId, playerName) => {
+  const handleDeletePlayer = async (playerId, _playerName) => {
     try {
       setDeleting(true);
       

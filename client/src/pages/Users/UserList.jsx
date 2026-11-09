@@ -5,7 +5,7 @@ const UserList = () => {
   const { isAdmin } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, _setError] = useState("");
 
   useEffect(() => {
     const mockUsers = [

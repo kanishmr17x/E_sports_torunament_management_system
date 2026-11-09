@@ -1,4 +1,5 @@
 const Player = require("../models/Player");
+const Team = require("../models/Team");
 const { asyncHandler, validateRequired, validateObjectId, errorResponse, successResponse, sendResponse } = require("../middleware/centralizedErrorHandler");
 
 // Add Player
@@ -25,6 +26,21 @@ exports.addPlayer = asyncHandler(async (req, res) => {
     // Validate age
     if (age < 13 || age > 100) {
         return sendResponse(res, errorResponse("Age must be between 13 and 100", 400));
+    }
+
+    if (teamId) {
+        if (!validateObjectId(teamId)) {
+            return sendResponse(res, errorResponse("Invalid team ID format", 400));
+        }
+        const team = await Team.findOne({ _id: teamId, isDeleted: false });
+        if (!team) {
+            return sendResponse(res, errorResponse("Team not found", 404));
+        }
+        if (team.captain.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+            return sendResponse(res, errorResponse("Not authorized to add a player to this team", 403));
+        }
+    } else if (req.user.role !== "admin") {
+        return sendResponse(res, errorResponse("A team is required", 400));
     }
 
     const player = await Player.create({

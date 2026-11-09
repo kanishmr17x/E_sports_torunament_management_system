@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
 
 const Reports = () => {
-  const { isAdmin } = useAuth();
-  const [stats, setStats] = useState({
+  const [stats, _setStats] = useState({
     totalTournaments: 12,
     totalTeams: 48,
     totalPlayers: 156,

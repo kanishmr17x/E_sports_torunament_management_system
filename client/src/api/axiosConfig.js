@@ -37,6 +37,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("userRole");
+      window.dispatchEvent(new Event("userUpdated"));
     }
     
     // Extract error message from new format if available
