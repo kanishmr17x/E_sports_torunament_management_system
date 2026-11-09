@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "postinstall": "cd client && npm install",
     "build": "cd client && npm run build",
     "lint": "cd client && npm run lint",
     "start": "node server/server.js"
