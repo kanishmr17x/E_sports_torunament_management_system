@@ -33,6 +33,8 @@ import Matches from "./pages/Matches/Matches";
 import Results from "./pages/Results/Results";
 import Leaderboard from "./pages/Leaderboard/Leaderboard";
 import Bracket from "./pages/Bracket/Bracket";
+import CustomCursor from "./components/CustomCursor";
+import "./styles/components.css";
 
 // Global error handler for uncaught promise rejections
 window.addEventListener('unhandledrejection', (event) => {
@@ -47,6 +49,7 @@ function App() {
         v7_relativeSplatPath: true 
       }}>
         <div className="page-root">
+          <CustomCursor />
           {/* Global animated cyber background */}
           <div className="app-bg-cyber" aria-hidden="true">
             <div className="cyber-glow cyber-glow-1"></div>
@@ -63,6 +66,7 @@ function App() {
               <Route path="/tournaments/:id" element={<TournamentDetails />} />
               <Route path="/tournaments/:id/register" element={<TournamentRegistration />} />
               <Route path="/tournaments/:id/bracket" element={<Bracket />} />
+              <Route path="/bracket" element={<Bracket />} />
               <Route path="/teams" element={<TeamList />} />
               <Route path="/teams/:id" element={<TeamDetails />} />
               <Route path="/players" element={<PlayerList />} />
@@ -74,9 +78,9 @@ function App() {
               <Route path="/dashboard/teams" element={<ProtectedRoute><TeamManagement /></ProtectedRoute>} />
               <Route path="/dashboard/teams/:id/manage" element={<ProtectedRoute><TeamManagement /></ProtectedRoute>} />
               <Route path="/payment/:id" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-              <Route path="/matches" element={<ProtectedRoute><Matches /></ProtectedRoute>} />
-              <Route path="/results" element={<ProtectedRoute><Results /></ProtectedRoute>} />
-              <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+              <Route path="/matches" element={<Matches />} />
+              <Route path="/results" element={<Results />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/admin" element={
               <ProtectedRoute allowedRoles={["admin", "organizer"]}>
                 <AdminDashboard />

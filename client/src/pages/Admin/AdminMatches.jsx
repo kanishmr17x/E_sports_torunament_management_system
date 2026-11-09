@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { getMatches, createMatch, updateMatch, enterMatchResult, deleteMatch, getTournaments } from "../../api/apiRoutes";
 import { useAuth } from "../../hooks/useAuth";
 import ConfirmModal from "../../components/ConfirmModal";
+import AdminNav from "../../components/AdminNav";
+import { formatDateTimeIST } from "../../utils/formatters";
 import "../../styles/theme.css";
 import "../../styles/adminMatches.css";
 
@@ -205,17 +207,16 @@ const AdminMatches = () => {
 
     return (
         <div className="admin-page">
-            <header className="admin-header">
-                <div className="header-content">
-                    <div>
-                        <h1>🎮 Match Management</h1>
-                        <p className="subtitle">Create and manage tournament matches</p>
-                    </div>
-                    <button onClick={openCreateForm} className="btn btn-primary">
-                        + Schedule Match
-                    </button>
-                </div>
-            </header>
+            <div className="container">
+                <AdminNav
+                    title="Match & Fixture Hub"
+                    subtitle="Schedule fixtures, configure server credentials, record scores, and advance rounds."
+                    actions={
+                        <button onClick={openCreateForm} className="btn btn-primary btn-sm">
+                            + Schedule Match
+                        </button>
+                    }
+                />
 
             <main className="admin-main">
                 {error && <div className="alert alert-error">{error}</div>}
@@ -491,7 +492,7 @@ const AdminMatches = () => {
                                                     <span>{match.team2?.teamName || "TBD"}</span>
                                                 </div>
                                             </td>
-                                            <td>{match.scheduledAt ? new Date(match.scheduledAt).toLocaleString() : "TBD"}</td>
+                                            <td>{match.scheduledAt ? formatDateTimeIST(match.scheduledAt) : "TBD"}</td>
                                             <td>
                                                 <span className={`match-status ${match.status}`}>
                                                     {match.status.charAt(0).toUpperCase() + match.status.slice(1)}
@@ -530,6 +531,7 @@ const AdminMatches = () => {
                     isLoading={false}
                 />
             </main>
+            </div>
         </div>
     );
 };

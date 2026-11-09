@@ -4,6 +4,9 @@ import { createTournament, getTournaments } from "../../api/apiRoutes";
 import api from "../../api/axiosConfig";
 import { useAuth } from "../../hooks/useAuth";
 import ConfirmModal from "../../components/ConfirmModal";
+import TournamentCard from "../../components/TournamentCard";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import { formatINR, formatDateIST } from "../../utils/formatters";
 import "../../styles/theme.css";
 import "../../styles/tournament.css";
 
@@ -37,11 +40,11 @@ const TournamentList = () => {
   });
 
   const games = [
-    { id: "PUBG", name: "PUBG", icon: "🎯" },
     { id: "BGMI", name: "BGMI", icon: "🔫" },
-    { id: "Free Fire", name: "Free Fire", icon: "🔥" },
-    { id: "COD", name: "COD", icon: "⚔️" },
-    { id: "Valorant", name: "Valorant", icon: "🛡️" },
+    { id: "BGMI", name: "BGMI", icon: "🔫" },
+    { id: "Free Fire", name: "Free Fire India", icon: "🔥" },
+    { id: "CS2", name: "Counter-Strike 2", icon: "💣" },
+    { id: "Valorant", name: "Valorant India", icon: "🛡️" },
     { id: "Other", name: "Other", icon: "🎮" }
   ];
 
@@ -249,6 +252,7 @@ const TournamentList = () => {
         </section>
 
         <div className="tournament-container">
+        <Breadcrumbs items={[{ label: "Tournaments Directory" }]} />
           <div className="loading-state">
             <div className="loading-spinner"></div>
             <p className="loading-text">Loading tournaments...</p>
@@ -424,7 +428,7 @@ const TournamentList = () => {
                   <div className="tournament-prize-banner">
                     <span className="prize-label">PRIZE POOL</span>
                     <span className="prize-val">
-                      {typeof tournament.prizePool === "number" ? `$${tournament.prizePool.toLocaleString()}` : (tournament.prizePool || "$0")}
+                      {formatINR(tournament.prizePool, { fallback: "Ranked" })}
                     </span>
                   </div>
 
@@ -443,13 +447,13 @@ const TournamentList = () => {
                     <div className="info-compact-item">
                       <span className="compact-lbl">Starts</span>
                       <span className="compact-val">
-                        {tournament.startDate ? new Date(tournament.startDate).toLocaleDateString() : "TBD"}
+                        {formatDateIST(tournament.startDate)}
                       </span>
                     </div>
                     <div className="info-compact-item">
                       <span className="compact-lbl">Ends</span>
                       <span className="compact-val">
-                        {tournament.endDate ? new Date(tournament.endDate).toLocaleDateString() : "TBD"}
+                        {formatDateIST(tournament.endDate)}
                       </span>
                     </div>
                   </div>
@@ -621,14 +625,14 @@ const TournamentList = () => {
                     </div>
 
                     <div className="form-group">
-                      <label htmlFor="prizePool">Prize Pool ($)</label>
+                      <label htmlFor="prizePool">Prize Pool (₹ INR)</label>
                       <input
                         type="number"
                         id="prizePool"
                         name="prizePool"
                         value={tournamentForm.prizePool}
                         onChange={handleInputChange}
-                        placeholder="Prize pool amount"
+                        placeholder="e.g. 500000 for ₹5,00,000"
                         min="0"
                       />
                     </div>

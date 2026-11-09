@@ -15,8 +15,8 @@
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(900px 420px at 10% -10%, rgba(0, 255, 163, 0.15), transparent 55%),
-              radial-gradient(900px 420px at 110% 0%, rgba(138, 43, 226, 0.15), transparent 55%);
+  background: radial-gradient(900px 420px at 10% -10%, rgba(0, 212, 255, 0.15), transparent 55%),
+              radial-gradient(900px 420px at 110% 0%, rgba(118, 87, 255, 0.15), transparent 55%);
   opacity: 0.8;
   z-index: 1;
 }
@@ -30,7 +30,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(10, 10, 15, 0.9), rgba(138, 43, 226, 0.8));
+  background: linear-gradient(135deg, rgba(10, 10, 15, 0.9), rgba(118, 87, 255, 0.8));
   overflow: hidden;
 }
 
@@ -38,7 +38,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(45deg, rgba(0, 255, 163, 0.1), rgba(138, 43, 226, 0.1));
+  background: linear-gradient(45deg, rgba(0, 212, 255, 0.1), rgba(118, 87, 255, 0.1));
   animation: gradient-shift 8s ease-in-out infinite;
 }
 
@@ -55,8 +55,8 @@
   background: linear-gradient(
     135deg,
     rgba(0, 0, 0, 0.4),
-    rgba(138, 43, 226, 0.2),
-    rgba(0, 255, 163, 0.1)
+    rgba(118, 87, 255, 0.2),
+    rgba(0, 212, 255, 0.1)
   );
   pointer-events: none;
 }
@@ -83,8 +83,8 @@
 }
 
 @keyframes glow-pulse {
-  0% { filter: drop-shadow(0 0 20px rgba(0, 255, 163, 0.6)); }
-  100% { filter: drop-shadow(0 0 30px rgba(138, 43, 226, 0.8)); }
+  0% { filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.6)); }
+  100% { filter: drop-shadow(0 0 30px rgba(118, 87, 255, 0.8)); }
 }
 
 .teams-banner-subtitle {
@@ -172,7 +172,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  box-shadow: 0 8px 24px rgba(0, 255, 163, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
 }
 
 .create-team-btn::before {
@@ -188,7 +188,7 @@
 
 .create-team-btn:hover {
   transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 12px 32px rgba(0, 255, 163, 0.4);
+  box-shadow: 0 12px 32px rgba(0, 212, 255, 0.4);
 }
 
 .create-team-btn:hover::before {
@@ -237,8 +237,8 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(0, 255, 163, 0.1), transparent 50%),
-              radial-gradient(circle at 100% 100%, rgba(138, 43, 226, 0.1), transparent 50%);
+  background: radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.1), transparent 50%),
+              radial-gradient(circle at 100% 100%, rgba(118, 87, 255, 0.1), transparent 50%);
   pointer-events: none;
   opacity: 0.6;
 }
@@ -246,7 +246,7 @@
 .team-card:hover {
   transform: translateY(-12px) scale(1.02);
   border-color: var(--neon-cyan);
-  box-shadow: 0 20px 40px rgba(0, 255, 163, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 212, 255, 0.3);
 }
 
 .team-card:hover::before {
@@ -339,10 +339,10 @@
 }
 
 .team-status.recruiting {
-  background: linear-gradient(135deg, rgba(0, 255, 163, 0.2), rgba(0, 255, 163, 0.1));
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 212, 255, 0.1));
   border: 2px solid var(--neon-cyan);
   color: var(--neon-cyan);
-  box-shadow: 0 0 20px rgba(0, 255, 163, 0.3);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
   animation: status-pulse 2s ease-in-out infinite;
 }
 
@@ -371,7 +371,7 @@
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  box-shadow: 0 8px 24px rgba(0, 255, 163, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
 }
 
 .team-action-btn::before {
@@ -387,7 +387,7 @@
 
 .team-action-btn:hover {
   transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 12px 32px rgba(0, 255, 163, 0.4);
+  box-shadow: 0 12px 32px rgba(0, 212, 255, 0.4);
 }
 
 .team-action-btn:hover::before {
@@ -642,7 +642,7 @@
   width: 90px;
   height: 90px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, rgba(0, 255, 163, 0.2), rgba(138, 43, 226, 0.3));
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(118, 87, 255, 0.3));
   border: 2px solid var(--neon-cyan);
   display: flex;
   align-items: center;
@@ -651,7 +651,7 @@
   font-size: 2.25rem;
   font-weight: 900;
   color: var(--neon-cyan);
-  box-shadow: 0 0 25px rgba(0, 255, 163, 0.25);
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.25);
   flex-shrink: 0;
 }
 
@@ -670,8 +670,8 @@
 .team-game-tag {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background: rgba(138, 43, 226, 0.2);
-  border: 1px solid rgba(138, 43, 226, 0.4);
+  background: rgba(118, 87, 255, 0.2);
+  border: 1px solid rgba(118, 87, 255, 0.4);
   border-radius: 9999px;
   color: #c084fc;
   font-size: 0.75rem;
@@ -705,8 +705,8 @@
 }
 
 .team-status-badge.active {
-  background: rgba(0, 255, 163, 0.15);
-  border: 1px solid rgba(0, 255, 163, 0.35);
+  background: rgba(0, 212, 255, 0.15);
+  border: 1px solid rgba(0, 212, 255, 0.35);
   color: var(--neon-cyan);
 }
 
@@ -738,7 +738,7 @@
   font-size: 1.75rem;
   font-weight: 900;
   color: var(--neon-cyan);
-  text-shadow: 0 0 10px rgba(0, 255, 163, 0.3);
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
   margin-bottom: 0.25rem;
 }
 
@@ -796,7 +796,7 @@
 
 .roster-card:hover {
   border-color: var(--neon-cyan);
-  box-shadow: 0 8px 24px rgba(0, 255, 163, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.15);
   transform: translateY(-3px);
 }
 
@@ -810,7 +810,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(0, 255, 163, 0.2), rgba(0, 212, 255, 0.3));
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 212, 255, 0.3));
   border: 2px solid var(--neon-cyan);
   display: flex;
   align-items: center;
@@ -833,8 +833,8 @@
 .player-role-chip {
   display: inline-block;
   padding: 0.15rem 0.5rem;
-  background: rgba(138, 43, 226, 0.2);
-  border: 1px solid rgba(138, 43, 226, 0.4);
+  background: rgba(118, 87, 255, 0.2);
+  border: 1px solid rgba(118, 87, 255, 0.4);
   border-radius: 9999px;
   color: #c084fc;
   font-size: 0.7rem;
@@ -868,7 +868,7 @@
 }
 
 .roster-player-link:hover {
-  background: rgba(0, 255, 163, 0.15);
+  background: rgba(0, 212, 255, 0.15);
   border-color: var(--neon-cyan);
   color: var(--neon-cyan);
 }
@@ -888,4 +888,459 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+
+/* ==========================================================================
+   OBSIDIAN CYBER ARENA — TEAMS & PLAYERS ENHANCEMENTS
+   ========================================================================== */
+
+.teams-banner-cyber {
+  position: relative;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  padding: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.teams-banner-cyber::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-primary);
+}
+
+.teams-kicker-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.teams-circuit-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: rgba(118, 87, 255, 0.15);
+  color: var(--accent-primary);
+  border: 1px solid rgba(118, 87, 255, 0.35);
+}
+
+.teams-count-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--accent-secondary);
+  border: 1px solid rgba(0, 212, 255, 0.25);
+}
+
+.teams-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 0.85rem 1.25rem;
+}
+
+.teams-game-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.teams-tab-btn {
+  background: none;
+  border: 1px solid transparent;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.teams-tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.teams-tab-btn.active {
+  color: var(--text-primary);
+  background: rgba(118, 87, 255, 0.16);
+  border-color: rgba(118, 87, 255, 0.4);
+}
+
+.teams-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 260px;
+  flex-grow: 0;
+}
+
+.teams-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.teams-search-input {
+  width: 100%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 0.85rem 0.55rem 2.25rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.teams-search-input:focus {
+  border-color: var(--accent-secondary);
+}
+
+.teams-cyber-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.teams-empty-state {
+  text-align: center;
+  padding: 4rem 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+}
+
+.teams-empty-icon {
+  font-size: 3.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.teams-empty-state h3 {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.teams-empty-state p {
+  color: var(--text-secondary);
+  font-size: 0.925rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.teams-error-alert {
+  background: rgba(255, 59, 59, 0.12);
+  border: 1px solid rgba(255, 59, 59, 0.3);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #FF6B6B;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   TEAM HERO DOSSIER CARD (TeamDetails.jsx)
+   ========================================================================== */
+.team-hero-dossier {
+  position: relative;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  margin-bottom: 2.5rem;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.team-hero-dossier::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-primary);
+}
+
+.team-dossier-glow {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(118, 87, 255, 0.16) 0%, rgba(0, 212, 255, 0.06) 50%, transparent 70%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.team-dossier-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.team-dossier-avatar-box {
+  width: 90px;
+  height: 90px;
+  border-radius: var(--radius-xl);
+  background: var(--bg-tertiary);
+  border: 2px solid rgba(118, 87, 255, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.team-dossier-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.team-dossier-avatar-char {
+  font-family: var(--font-heading);
+  font-size: 2.75rem;
+  font-weight: 900;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.team-dossier-identity {
+  flex-grow: 1;
+  min-width: 260px;
+}
+
+.team-dossier-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.team-created-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.team-dossier-name {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.team-dossier-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 650px;
+  margin: 0;
+}
+
+.team-dossier-cta-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-self: center;
+}
+
+.team-dossier-telemetry {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  gap: 1.25rem;
+}
+
+.dossier-stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dossier-stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.dossier-stat-number {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.dossier-stat-number.highlight-win {
+  color: #10B981;
+}
+
+.dossier-stat-number.highlight-cyan {
+  color: var(--accent-secondary);
+}
+
+.dossier-bar-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 0.25rem;
+}
+
+.dossier-bar-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 2px;
+}
+
+.team-roster-section {
+  margin-top: 2.5rem;
+}
+
+.team-roster-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.team-roster-title {
+  font-family: var(--font-heading);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.team-roster-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.team-players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+/* ==========================================================================
+   PLAYER DETAILS (PlayerDetails.jsx)
+   ========================================================================== */
+.player-squad-section {
+  margin-top: 2rem;
+}
+
+.player-contract-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-lg);
+  flex-wrap: wrap;
+}
+
+.player-contract-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  border: 1px solid rgba(118, 87, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--accent-secondary);
+  flex-shrink: 0;
+}
+
+.player-contract-info {
+  flex-grow: 1;
+  min-width: 200px;
+}
+
+.player-contract-info h4 {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem;
+}
+
+.player-contract-info p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.player-free-agent-box {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-lg);
+  flex-wrap: wrap;
 }

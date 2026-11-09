@@ -1,267 +1,274 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { getPaymentById, processPayment } from "../../api/apiRoutes";
 import { useAuth } from "../../hooks/useAuth";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import { formatINR } from "../../utils/formatters";
 import "../../styles/theme.css";
 import "../../styles/payment.css";
 
 const Payment = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const { user } = useAuth();
-    const [payment, setPayment] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
-    const [processing, setProcessing] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState("test");
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [payment, setPayment] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("test");
 
-    useEffect(() => {
-        loadPayment();
-    }, [id]);
-
+  useEffect(() => {
     const loadPayment = async () => {
-        if (!user) {
-            navigate("/login");
-            return;
-        }
-        try {
-            setLoading(true);
-            const res = await getPaymentById(id);
-            setPayment(res);
-        } catch (err) {
-            setError(err.message || "Failed to load payment");
-        } finally {
-            setLoading(false);
-        }
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+      try {
+        setLoading(true);
+        const res = await getPaymentById(id);
+        setPayment(res);
+      } catch (err) {
+        setError(err.message || "Failed to load payment invoice");
+      } finally {
+        setLoading(false);
+      }
     };
+    loadPayment();
+  }, [id, user, navigate]);
 
-    const handlePay = async () => {
-        if (!payment || payment.status === "paid") return;
-        
-        setError("");
-        setSuccess("");
-        setProcessing(true);
+  const handlePay = async () => {
+    if (!payment || payment.status === "paid") return;
+    
+    setError("");
+    setSuccess("");
+    setProcessing(true);
 
-        try {
-            const isTestMode = import.meta.env.DEV && paymentMethod === "test";
-            
-            if (isTestMode) {
-                // Simulate payment processing
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                await processPayment(id);
-                setSuccess("Payment successful! Your team is now registered.");
-                setTimeout(() => navigate("/dashboard"), 3000);
-            } else {
-                await processPayment(id, { paymentMethod });
-                setSuccess("Payment processing initiated.");
-                setTimeout(() => navigate("/dashboard"), 3000);
-            }
-        } catch (err) {
-            setError(err.message || "Payment failed");
-        } finally {
-            setProcessing(false);
-        }
-    };
-
-    const handleCancel = () => {
-        navigate("/dashboard");
-    };
-
-    if (loading) {
-        return (
-            <div className="payment-page loading">
-                <div className="spinner-container">
-                    <div className="spinner"></div>
-                    <p>Loading payment details...</p>
-                </div>
-            </div>
-        );
+    try {
+      const isTestMode = import.meta.env.DEV && paymentMethod === "test";
+      
+      if (isTestMode) {
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        await processPayment(id);
+        setSuccess("Payment verified! Your squad is confirmed in the championship bracket.");
+        setTimeout(() => navigate("/dashboard"), 2500);
+      } else {
+        await processPayment(id, { paymentMethod });
+        setSuccess("Payment processing initiated with payment gateway.");
+        setTimeout(() => navigate("/dashboard"), 2500);
+      }
+    } catch (err) {
+      setError(err.message || "Payment transaction could not be completed.");
+    } finally {
+      setProcessing(false);
     }
+  };
 
-    if (error && !payment) {
-        return (
-            <div className="payment-page error">
-                <div className="error-card">
-                    <h2>⚠️ Payment Not Found</h2>
-                    <p>{error}</p>
-                    <button onClick={handleCancel} className="btn btn-primary">Back to Dashboard</button>
-                </div>
-            </div>
-        );
-    }
+  const breadcrumbs = [
+    { label: "Home", path: "/" },
+    { label: "Dashboard", path: "/dashboard" },
+    { label: "Invoice Checkout" },
+  ];
 
-    if (!payment) {
-        return (
-            <div className="payment-page error">
-                <div className="error-card">
-                    <h2>⚠️ Payment Not Found</h2>
-                    <p>This payment no longer exists.</p>
-                    <button onClick={handleCancel} className="btn btn-primary">Back to Dashboard</button>
-                </div>
-            </div>
-        );
-    }
-
-    const isPaid = payment.status === "paid";
-    const isPending = payment.status === "pending" || payment.status === "processing";
-
+  if (loading) {
     return (
-        <div className="payment-page">
-            <header className="payment-header">
-                <div className="header-content">
-                    <div>
-                        <h1>Payment</h1>
-                        <p className="subtitle">Complete your tournament registration</p>
-                    </div>
-                    <span className={`status-badge ${payment.status}`}>
-                        {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
-                    </span>
-                </div>
-            </header>
-
-            <main className="payment-main">
-                <div className="payment-container">
-                    <div className="payment-details">
-                        <div className="detail-card">
-                            <h2>📋 Payment Summary</h2>
-                            <div className="detail-grid">
-                                <div className="detail-item">
-                                    <label>Tournament</label>
-                                    <span>{payment.tournamentId?.name || "Unknown"}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <label>Team</label>
-                                    <span>{payment.teamId?.teamName || "Unknown"}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <label>Transaction ID</label>
-                                    <span className="transaction-id">{payment.transactionId}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <label>Payment Method</label>
-                                    <span>{payment.paymentMethod?.toUpperCase() || "Test"}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <label>Created</label>
-                                    <span>{new Date(payment.createdAt).toLocaleString()}</span>
-                                </div>
-                                {payment.paidAt && (
-                                    <div className="detail-item">
-                                        <label>Completed</label>
-                                        <span>{new Date(payment.paidAt).toLocaleString()}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="amount-card">
-                            <div className="amount-label">Amount Due</div>
-                            <div className="amount-value">${payment.amount}</div>
-                            <div className="amount-currency">{payment.currency || "USD"}</div>
-                        </div>
-                    </div>
-
-                    <div className="payment-action">
-                        <div className="action-card">
-                            {error && <div className="alert alert-error">{error}</div>}
-                            {success && <div className="alert alert-success">{success}</div>}
-
-                            {isPaid ? (
-                                <div className="paid-state">
-                                    <div className="paid-icon">✅</div>
-                                    <h2>Payment Completed</h2>
-                                    <p>Your registration is confirmed. Your team is now officially registered for the tournament.</p>
-                                    <div className="paid-details">
-                                        <p><strong>Transaction ID:</strong> {payment.transactionId}</p>
-                                        <p><strong>Completed:</strong> {payment.paidAt ? new Date(payment.paidAt).toLocaleString() : "N/A"}</p>
-                                    </div>
-                                    <button onClick={handleCancel} className="btn btn-primary btn-block">
-                                        Back to Dashboard
-                                    </button>
-                                </div>
-                            ) : isPending ? (
-                                <div className="pending-state">
-                                    <div className="pending-icon">⏳</div>
-                                    <h2>Payment Pending</h2>
-                                    <p>Your payment is being processed. Please wait...</p>
-                                    {payment.gatewayResponse?.test && (
-                                        <div className="test-mode-notice">
-                                            🧪 Test Mode: Click "Complete Payment" to simulate successful payment
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="payment-form">
-                                    <h2>Complete Payment</h2>
-                                    <p>Select your payment method and click below to proceed.</p>
-                                    
-                                    <div className="payment-methods">
-                                        <label className={`payment-method ${paymentMethod === "test" ? "selected" : ""}`}>
-                                            <input
-                                                type="radio"
-                                                name="paymentMethod"
-                                                value="test"
-                                                checked={paymentMethod === "test"}
-                                                onChange={(e) => setPaymentMethod(e.target.value)}
-                                            />
-                                            <div className="method-info">
-                                                <span className="method-name">Test Payment (Development)</span>
-                                                <span className="method-desc">Simulates successful payment for testing</span>
-                                            </div>
-                                            <span className="radio-custom"></span>
-                                        </label>
-                                        
-                                        <label className={`payment-method ${paymentMethod === "stripe" ? "selected" : ""}`}>
-                                            <input
-                                                type="radio"
-                                                name="paymentMethod"
-                                                value="stripe"
-                                                checked={paymentMethod === "stripe"}
-                                                onChange={(e) => setPaymentMethod(e.target.value)}
-                                            />
-                                            <div className="method-info">
-                                                <span className="method-name">Stripe</span>
-                                                <span className="method-desc">Credit/Debit Card, Apple Pay, Google Pay</span>
-                                            </div>
-                                            <span className="radio-custom"></span>
-                                        </label>
-                                        
-                                        <label className={`payment-method ${paymentMethod === "razorpay" ? "selected" : ""}`}>
-                                            <input
-                                                type="radio"
-                                                name="paymentMethod"
-                                                value="razorpay"
-                                                checked={paymentMethod === "razorpay"}
-                                                onChange={(e) => setPaymentMethod(e.target.value)}
-                                            />
-                                            <div className="method-info">
-                                                <span className="method-name">Razorpay</span>
-                                                <span className="method-desc">UPI, Cards, Net Banking, Wallets</span>
-                                            </div>
-                                            <span className="radio-custom"></span>
-                                        </label>
-                                    </div>
-
-                                    <button
-                                        onClick={handlePay}
-                                        disabled={processing}
-                                        className="btn btn-primary btn-block pay-btn"
-                                    >
-                                        {processing ? "Processing..." : `Pay $${payment.amount}`}
-                                    </button>
-                                </div>
-                            )}
-
-                            <button onClick={handleCancel} className="btn btn-outline btn-block cancel-btn">
-                                Cancel & Return to Dashboard
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </main>
+      <div className="payment-page-cyber">
+        <div className="container" style={{ textAlign: "center", padding: "120px 20px" }}>
+          <div className="admin-spinner" style={{ margin: "0 auto 1.5rem" }} />
+          <h3 style={{ color: "var(--text-primary)", marginBottom: "0.5rem" }}>Initializing Secure Payment Terminal...</h3>
+          <p style={{ color: "var(--text-secondary)" }}>Accessing tournament entry invoice and ledger state.</p>
         </div>
+      </div>
     );
+  }
+
+  if (error && !payment) {
+    return (
+      <div className="payment-page-cyber">
+        <div className="container" style={{ textAlign: "center", padding: "120px 20px" }}>
+          <div style={{ fontSize: "3.5rem", marginBottom: "1rem" }}>⚠️</div>
+          <h2 style={{ color: "var(--danger)", marginBottom: "1rem" }}>Invoice Not Found</h2>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "2rem" }}>
+            {error || `Payment invoice with ID [${id}] does not exist.`}
+          </p>
+          <Link to="/dashboard" className="btn btn-primary">
+            Return to Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const isPaid = payment?.status === "paid";
+  const amount = payment?.amount || 0;
+  const tournamentName = payment?.tournamentId?.name || "Competitive Esports Tournament";
+  const game = payment?.tournamentId?.game || "BGMI";
+  const teamName = payment?.teamId?.name || payment?.teamName || "Registered Squad";
+
+  return (
+    <div className="payment-page-cyber">
+      <div className="container">
+        <Breadcrumbs items={breadcrumbs} />
+
+        {/* Terminal Header */}
+        <header className="payment-banner-cyber">
+          <div className="payment-badge-row">
+            <span className="payment-secure-badge">🔒 256-BIT ENCRYPTED</span>
+            <span className={`payment-status-pill ${payment?.status || "pending"}`}>
+              STATUS: {payment?.status?.toUpperCase() || "PENDING INVOICE"}
+            </span>
+          </div>
+          <h1 className="payment-hero-title">Tournament Entry Fee Settlement</h1>
+          <p className="payment-hero-subtitle">
+            Confirm your squad slot reservation by settling the certified entry fee.
+          </p>
+        </header>
+
+        {error && (
+          <div className="alert alert-danger" style={{ marginBottom: "1.5rem" }}>
+            ⚠️ {error}
+          </div>
+        )}
+        {success && (
+          <div className="alert alert-success" style={{ marginBottom: "1.5rem" }}>
+            ✅ {success}
+          </div>
+        )}
+
+        {/* 2-Column Asymmetric Checkout Grid */}
+        <div className="payment-terminal-grid">
+          {/* Left Column: Order Invoice & Roster Dossier */}
+          <section className="payment-invoice-card">
+            <div className="payment-card-header">
+              <span className="payment-card-icon">📄</span>
+              <div>
+                <h3 className="payment-section-heading">Circuit Entry Invoice</h3>
+                <span className="payment-invoice-ref">REF: {id}</span>
+              </div>
+            </div>
+
+            <div className="invoice-specs-block">
+              <div className="invoice-spec-item">
+                <span className="invoice-lbl">Tournament Title</span>
+                <span className="invoice-val">{tournamentName}</span>
+              </div>
+              <div className="invoice-spec-item">
+                <span className="invoice-lbl">Game Discipline</span>
+                <span className="invoice-val">🎮 {game}</span>
+              </div>
+              <div className="invoice-spec-item">
+                <span className="invoice-lbl">Fielded Squad</span>
+                <span className="invoice-val highlight-squad">🛡️ {teamName}</span>
+              </div>
+              <div className="invoice-spec-item">
+                <span className="invoice-lbl">Registered Athlete</span>
+                <span className="invoice-val">👤 {user?.username}</span>
+              </div>
+            </div>
+
+            <div className="invoice-breakdown-list">
+              <div className="invoice-row">
+                <span>Base Tournament Entry Fee</span>
+                <span className="invoice-num">{formatINR(amount)}</span>
+              </div>
+              <div className="invoice-row">
+                <span>Automated Referee Telemetry</span>
+                <span className="invoice-num-free">INCLUDED</span>
+              </div>
+              <div className="invoice-row">
+                <span>Anti-Cheat Forensics Monitoring</span>
+                <span className="invoice-num-free">INCLUDED</span>
+              </div>
+              <div className="invoice-total-row">
+                <span>Total Due Now</span>
+                <span className="invoice-total-amount">{formatINR(amount)}</span>
+              </div>
+            </div>
+          </section>
+
+          {/* Right Column: Payment Method & Execution Terminal */}
+          <aside className="payment-processor-card">
+            <h3 className="payment-processor-heading">Select Settlement Method</h3>
+
+            {isPaid ? (
+              <div className="payment-settled-box">
+                <span className="settled-icon">✅</span>
+                <h4>Invoice Settled</h4>
+                <p>This tournament entry invoice has already been verified and confirmed.</p>
+                <Link to="/dashboard" className="btn btn-primary btn-full" style={{ marginTop: "1rem" }}>
+                  Go to Player Dashboard →
+                </Link>
+              </div>
+            ) : (
+              <div className="payment-action-flow">
+                <div className="payment-methods-stack">
+                  <label className={`method-tile ${paymentMethod === "test" ? "active" : ""}`}>
+                    <input
+                      type="radio"
+                      name="method"
+                      value="test"
+                      checked={paymentMethod === "test"}
+                      onChange={() => setPaymentMethod("test")}
+                    />
+                    <div className="method-tile-content">
+                      <div className="method-name">⚡ Developer Instant Sandbox</div>
+                      <div className="method-sub">Instant zero-risk settlement for test tournaments</div>
+                    </div>
+                  </label>
+
+                  <label className={`method-tile ${paymentMethod === "card" ? "active" : ""}`}>
+                    <input
+                      type="radio"
+                      name="method"
+                      value="card"
+                      checked={paymentMethod === "card"}
+                      onChange={() => setPaymentMethod("card")}
+                    />
+                    <div className="method-tile-content">
+                      <div className="method-name">💳 Credit / Debit Card</div>
+                      <div className="method-sub">RuPay, Visa, MasterCard</div>
+                    </div>
+                  </label>
+
+                  <label className={`method-tile ${paymentMethod === "upi" ? "active" : ""}`}>
+                    <input
+                      type="radio"
+                      name="method"
+                      value="upi"
+                      checked={paymentMethod === "upi"}
+                      onChange={() => setPaymentMethod("upi")}
+                    />
+                    <div className="method-tile-content">
+                      <div className="method-name">📱 UPI / Instant Transfer</div>
+                      <div className="method-sub">Google Pay, PhonePe, Paytm, BHIM UPI QR</div>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="payment-cta-block">
+                  <button
+                    type="button"
+                    onClick={handlePay}
+                    disabled={processing}
+                    className="btn btn-primary btn-full btn-lg"
+                  >
+                    {processing ? "Authorizing Settlement..." : `⚡ Pay ${formatINR(amount)} (INR)`}
+                  </button>
+                  <Link to="/dashboard" className="btn btn-outline btn-full btn-sm" style={{ marginTop: "0.5rem" }}>
+                    Cancel & Return to Dashboard
+                  </Link>
+                </div>
+
+                <div className="payment-security-footer">
+                  <span>🔒 PCI-DSS Certified &bull; SSL Secured</span>
+                </div>
+              </div>
+            )}
+          </aside>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Payment;

@@ -226,7 +226,7 @@
 .filter-select:focus {
     outline: none;
     border-color: var(--neon-cyan);
-    box-shadow: 0 0 0 3px rgba(0, 255, 163, 0.2);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
 }
 
 /* Users Table */
@@ -415,7 +415,7 @@
 .payment-status.processing { background: rgba(0, 212, 255, 0.2); color: var(--neon-blue); }
 .payment-status.failed { background: rgba(255, 59, 59, 0.2); color: var(--danger); }
 .payment-status.cancelled { background: rgba(107, 114, 128, 0.2); color: var(--text-muted); }
-.payment-status.refunded { background: rgba(138, 43, 226, 0.2); color: var(--neon-purple); }
+.payment-status.refunded { background: rgba(118, 87, 255, 0.2); color: var(--neon-purple); }
 
 .match-status.scheduled { background: rgba(107, 114, 128, 0.2); color: var(--text-muted); }
 .match-status.live { background: rgba(255, 0, 110, 0.2); color: var(--neon-pink); }
@@ -593,7 +593,7 @@
 .form-group textarea:focus {
     outline: none;
     border-color: var(--neon-cyan);
-    box-shadow: 0 0 0 3px rgba(0, 255, 163, 0.2);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
 }
 
 .form-actions {

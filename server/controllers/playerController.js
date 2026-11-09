@@ -39,7 +39,7 @@ exports.addPlayer = asyncHandler(async (req, res) => {
         if (team.captain.toString() !== req.user._id.toString() && req.user.role !== "admin") {
             return sendResponse(res, errorResponse("Not authorized to add a player to this team", 403));
         }
-    } else if (req.user.role !== "admin") {
+    } else if (req.user.role !== "admin" && req.user.role !== "organizer") {
         return sendResponse(res, errorResponse("A team is required", 400));
     }
 
@@ -51,6 +51,10 @@ exports.addPlayer = asyncHandler(async (req, res) => {
         role: role || "Other",
         teamId: teamId || null
     });
+
+    if (teamId) {
+        await Team.findByIdAndUpdate(teamId, { $inc: { totalMembers: 1 } });
+    }
 
     sendResponse(res, successResponse("Player created successfully", player, 201));
 });
@@ -100,6 +104,21 @@ exports.deletePlayer = asyncHandler(async (req, res) => {
     
     if (!player) {
         return sendResponse(res, errorResponse("Player not found or already deleted", 404));
+    }
+
+    // Check authorization: must be admin or captain of the player's team
+    if (player.teamId) {
+        const team = await Team.findById(player.teamId);
+        if (team) {
+            const isCaptain = team.captain.toString() === req.user._id.toString();
+            const isStaff = req.user.role === "admin" || req.user.role === "organizer";
+            if (!isCaptain && !isStaff) {
+                return sendResponse(res, errorResponse("Not authorized to remove this player", 403));
+            }
+            await Team.findByIdAndUpdate(player.teamId, { $inc: { totalMembers: -1 } });
+        }
+    } else if (req.user.role !== "admin") {
+        return sendResponse(res, errorResponse("Not authorized to remove this player", 403));
     }
 
     // Soft delete the player

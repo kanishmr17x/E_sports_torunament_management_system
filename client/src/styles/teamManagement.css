@@ -268,8 +268,8 @@
 .form-group textarea:focus {
     outline: none;
     border-color: var(--neon-cyan);
-    background: rgba(0, 255, 163, 0.05);
-    box-shadow: 0 0 0 3px rgba(0, 255, 163, 0.2);
+    background: rgba(0, 212, 255, 0.05);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
 }
 
 .form-group input:disabled,
@@ -493,4 +493,207 @@
     .form-actions .btn {
         width: 100%;
     }
+}
+
+
+/* ==========================================================================
+   OBSIDIAN CYBER ARENA — SQUAD OPERATIONS DECK
+   ========================================================================== */
+.team-mgmt-page-cyber {
+  min-height: 100vh;
+  padding: clamp(80px, 10vw, 100px) 1.5rem 4rem;
+  background-color: var(--bg-primary);
+}
+
+.team-mgmt-banner-cyber {
+  position: relative;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  padding: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.team-mgmt-banner-cyber::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-primary);
+}
+
+.team-mgmt-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.team-mgmt-circuit-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: rgba(118, 87, 255, 0.15);
+  color: var(--accent-primary);
+  border: 1px solid rgba(118, 87, 255, 0.35);
+}
+
+.team-mgmt-status-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--accent-secondary);
+  border: 1px solid rgba(0, 212, 255, 0.25);
+}
+
+.team-mgmt-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.15;
+  margin-bottom: 0.75rem;
+}
+
+.team-mgmt-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 650px;
+  margin: 0;
+}
+
+.team-mgmt-edit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 1.25fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .team-mgmt-edit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.team-mgmt-settings-card,
+.team-mgmt-roster-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: clamp(1.75rem, 4vw, 2.5rem);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.mgmt-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--glass-border-subtle);
+}
+
+.mgmt-card-icon {
+  font-size: 2rem;
+}
+
+.mgmt-card-heading {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.mgmt-card-sub {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.mgmt-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.mgmt-roster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.mgmt-roster-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 1.15rem;
+  transition: all 0.2s ease;
+}
+
+.mgmt-roster-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 212, 255, 0.35);
+}
+
+.mgmt-roster-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 2px solid rgba(0, 212, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  color: var(--accent-secondary);
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.mgmt-roster-meta {
+  flex-grow: 1;
+}
+
+.mgmt-roster-meta h4 {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem;
+}
+
+.mgmt-roster-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.mgmt-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
 }

@@ -1,6 +1,8 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getPlayerById } from "../../api/apiRoutes";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import { formatDateIST } from "../../utils/formatters";
 import "../../styles/theme.css";
 import "../../styles/teams.css";
 
@@ -18,7 +20,7 @@ const PlayerDetails = () => {
         const playerData = response.success ? response.data : response;
         setPlayer(playerData);
       } catch (err) {
-        setError(err.message || "Failed to fetch player dossier");
+        setError(err.message || "Failed to fetch athlete dossier");
       } finally {
         setLoading(false);
       }
@@ -29,11 +31,10 @@ const PlayerDetails = () => {
   if (loading) {
     return (
       <div className="teams-page">
-        <div className="teams-container">
-          <div className="loading-state">
-            <div className="loading-spinner" />
-            <p className="loading-text">Loading player dossier...</p>
-          </div>
+        <div className="container" style={{ textAlign: "center", padding: "120px 20px" }}>
+          <div className="admin-spinner" style={{ margin: "0 auto 1.5rem" }} />
+          <h3 style={{ color: "var(--text-primary)", marginBottom: "0.5rem" }}>Loading Athlete Dossier...</h3>
+          <p style={{ color: "var(--text-secondary)" }}>Accessing verified competitor career stats.</p>
         </div>
       </div>
     );
@@ -42,99 +43,127 @@ const PlayerDetails = () => {
   if (error || !player) {
     return (
       <div className="teams-page">
-        <div className="teams-container">
-          <div className="error-state">
-            <div className="error-icon">⚠️</div>
-            <h2 className="error-title">Player Not Found</h2>
-            <p className="error-text">{error || `Player with ID ${id} was not found.`}</p>
-            <Link to="/players" className="retry-btn" style={{ textDecoration: "none", display: "inline-block" }}>
-              ← Return to Players
-            </Link>
-          </div>
+        <div className="container" style={{ textAlign: "center", padding: "120px 20px" }}>
+          <div style={{ fontSize: "3.5rem", marginBottom: "1rem" }}>⚠️</div>
+          <h2 style={{ color: "var(--danger)", marginBottom: "1rem" }}>Athlete Not Found</h2>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "2rem" }}>
+            {error || `Athlete with ID [${id}] was not located in the verified database.`}
+          </p>
+          <Link to="/players" className="btn btn-primary">
+            ← Return to Players Directory
+          </Link>
         </div>
       </div>
     );
   }
 
   const initial = player.playerName ? player.playerName.charAt(0).toUpperCase() : "P";
+  const teamObj = player.teamId && typeof player.teamId === "object" ? player.teamId : null;
+  const teamName = teamObj ? teamObj.teamName : (typeof player.teamId === "string" ? "Assigned Squad" : null);
+
+  const breadcrumbs = [
+    { label: "Home", path: "/" },
+    { label: "Athletes", path: "/players" },
+    { label: player.playerName || "Athlete Dossier" },
+  ];
 
   return (
-    <div className="player-details-page">
-      <section className="teams-banner">
-        <div className="teams-banner-overlay" />
-        <div className="teams-banner-content">
-          <h1 className="teams-banner-title">{player.playerName}</h1>
-          <p className="teams-banner-subtitle">Esports Athlete Dossier</p>
-        </div>
-      </section>
+    <div className="teams-page">
+      <div className="container">
+        <Breadcrumbs items={breadcrumbs} />
 
-      <div className="team-details-container">
-        {/* Player Profile Card */}
-        <div className="team-hero-card">
-          <div className="team-hero-header">
-            <div className="team-avatar-large">
-              {initial}
+        {/* Athlete Dossier Hero */}
+        <section className="team-hero-dossier">
+          <div className="team-dossier-glow" />
+
+          <div className="team-dossier-top">
+            <div className="team-dossier-avatar-box">
+              <span className="team-dossier-avatar-char">{initial}</span>
             </div>
 
-            <div className="team-hero-info">
-              <span className="team-game-tag">🎮 {player.gameId || "Competitive Esports"}</span>
-              <h2 className="team-hero-title">{player.playerName}</h2>
-              <div className="team-meta-pills">
-                <span className="player-role-chip" style={{ fontSize: "0.8rem", padding: "0.25rem 0.75rem" }}>
-                  Role: {player.role || "Competitor"}
-                </span>
-                <span className="compact-lbl">
-                  Joined: {player.createdAt ? new Date(player.createdAt).toLocaleDateString() : "Recently"}
+            <div className="team-dossier-identity">
+              <div className="team-dossier-badges">
+                <span className="player-role-badge">🎯 {player.role || "Competitor"}</span>
+                <span className="team-game-tag">🎮 {player.gameId || "BGMI"}</span>
+                <span className="team-status-chip active">Verified Competitor</span>
+                <span className="team-created-date">
+                  Joined {player.createdAt ? formatDateIST(player.createdAt) : "Active Season"}
                 </span>
               </div>
-            </div>
-          </div>
 
-          <div className="team-stats-strip">
-            <div className="team-stat-item">
-              <div className="team-stat-num">{player.age || "—"}</div>
-              <div className="team-stat-lbl">Player Age</div>
+              <h1 className="team-dossier-name">{player.playerName}</h1>
+              <p className="team-dossier-desc">
+                Official athlete profile. Competes in organized circuit matches and tournament fixtures.
+              </p>
             </div>
-            <div className="team-stat-item">
-              <div className="team-stat-num">{player.contact ? "Active" : "—"}</div>
-              <div className="team-stat-lbl">Communication</div>
-            </div>
-            <div className="team-stat-item">
-              <div className="team-stat-num">
-                {player.teamId ? (typeof player.teamId === "object" ? player.teamId.teamName : "Assigned") : "Free Agent"}
-              </div>
-              <div className="team-stat-lbl">Squad Status</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Assigned Team Card */}
-        {player.teamId && typeof player.teamId === "object" && (
-          <div className="team-roster-section" style={{ marginBottom: "2rem" }}>
-            <div className="section-head">
-              <h2>🛡️ Assigned Squad</h2>
-              <Link to={`/teams/${player.teamId._id}`} className="roster-player-link">
-                View Team Profile →
+            <div className="team-dossier-cta-group">
+              <Link to={`/tournaments?playerId=${player._id}`} className="btn btn-primary btn-lg">
+                ⚡ Deploy to Tournament
+              </Link>
+              <Link to="/players" className="btn btn-outline btn-lg">
+                ← All Athletes
               </Link>
             </div>
-            <p style={{ color: "var(--text-secondary)", margin: 0 }}>
-              This athlete competes under <strong>{player.teamId.teamName}</strong> in <strong>{player.teamId.game || player.gameId || "tournaments"}</strong>.
-            </p>
           </div>
-        )}
 
-        {/* Action Row */}
-        <div className="team-action-bar">
-          <Link to={`/register?playerId=${player._id}`} className="tournament-action-btn-primary" style={{ padding: "0.85rem 1.75rem" }}>
-            ⚡ Register in Tournament
-          </Link>
-          <Link to="/players" className="tournament-action-btn-secondary" style={{ padding: "0.85rem 1.75rem" }}>
-            ← All Players
-          </Link>
-          <Link to="/teams" className="tournament-action-btn-secondary" style={{ padding: "0.85rem 1.75rem" }}>
-            👥 Browse Teams
-          </Link>
-        </div>
+          {/* Telemetry Bar */}
+          <div className="team-dossier-telemetry">
+            <div className="dossier-stat-tile">
+              <span className="dossier-stat-label">Athlete Age</span>
+              <span className="dossier-stat-number">{player.age ? `${player.age} Yrs` : "N/A"}</span>
+            </div>
+            <div className="dossier-stat-tile">
+              <span className="dossier-stat-label">Communication</span>
+              <span className="dossier-stat-number highlight-win">{player.contact ? "Active Link" : "Private"}</span>
+            </div>
+            <div className="dossier-stat-tile">
+              <span className="dossier-stat-label">Roster Status</span>
+              <span className="dossier-stat-number highlight-cyan">
+                {teamName ? "Contracted" : "Free Agent"}
+              </span>
+            </div>
+            <div className="dossier-stat-tile">
+              <span className="dossier-stat-label">Primary Game Title</span>
+              <span className="dossier-stat-number">{player.gameId || "BGMI"}</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Assigned Squad Section */}
+        <section className="player-squad-section">
+          <div className="td-card-cyber">
+            <h3 className="td-card-heading">🛡️ Contracted Squad Organization</h3>
+            
+            {teamObj ? (
+              <div className="player-contract-card">
+                <div className="player-contract-avatar">
+                  {teamObj.teamName?.charAt(0).toUpperCase() || "T"}
+                </div>
+                <div className="player-contract-info">
+                  <h4>{teamObj.teamName}</h4>
+                  <p>Competing in {teamObj.game || player.gameId || "Championship Tournaments"}</p>
+                </div>
+                <Link to={`/teams/${teamObj._id}`} className="btn btn-primary btn-sm">
+                  View Squad Dossier →
+                </Link>
+              </div>
+            ) : (
+              <div className="player-free-agent-box">
+                <span style={{ fontSize: "2rem" }}>⚡</span>
+                <div>
+                  <h4 style={{ margin: "0 0 0.25rem", color: "var(--text-primary)" }}>Free Agent Athlete</h4>
+                  <p style={{ margin: 0, color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+                    This competitor is currently unaffiliated and eligible for recruitment by teams and organizers.
+                  </p>
+                </div>
+                <Link to="/teams" className="btn btn-outline btn-sm">
+                  Browse Squads
+                </Link>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

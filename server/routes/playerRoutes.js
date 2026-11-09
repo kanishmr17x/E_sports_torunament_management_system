@@ -19,6 +19,6 @@ router.get("/:id", getPlayerById);
 router.post("/add", protect, addPlayer);
 
 // Staff only (admin or organizer)
-router.delete("/:id", protect, staffOnly, deletePlayer);
+router.delete("/:id", protect, deletePlayer);
 
 module.exports = router;

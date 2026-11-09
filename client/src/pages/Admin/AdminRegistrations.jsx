@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { getAdminRegistrations, getRegistrationStats, approveRegistration, rejectRegistration } from "../../api/apiRoutes";
 import { useAuth } from "../../hooks/useAuth";
 import ConfirmModal from "../../components/ConfirmModal";
+import AdminNav from "../../components/AdminNav";
+import { formatINR, formatDateTimeIST } from "../../utils/formatters";
 import "../../styles/theme.css";
 import "../../styles/adminRegistrations.css";
 
@@ -112,19 +114,11 @@ const AdminRegistrations = () => {
 
     return (
         <div className="admin-page">
-            <header className="admin-header">
-                <div className="header-content">
-                    <div>
-                        <h1>📝 Registration Management</h1>
-                        <p className="subtitle">Review and manage tournament registrations</p>
-                    </div>
-                    {pendingApprovals > 0 && (
-                        <div className="pending-badge">
-                            {pendingApprovals} pending approvals
-                        </div>
-                    )}
-                </div>
-            </header>
+            <div className="container">
+                <AdminNav
+                    title="Registration Approvals"
+                    subtitle="Review pending tournament entries, verify player requirements, approve or reject rosters."
+                />
 
             <main className="admin-main">
                 {error && <div className="alert alert-error">{error}</div>}
@@ -253,13 +247,13 @@ const AdminRegistrations = () => {
                                                         <span className="tournament-game">{reg.tournamentId?.game}</span>
                                                     </div>
                                                 </td>
-                                                <td>{reg.registeredAt ? new Date(reg.registeredAt).toLocaleString() : "N/A"}</td>
+                                                <td>{reg.registeredAt ? formatDateTimeIST(reg.registeredAt) : "N/A"}</td>
                                                 <td>
                                                     <span className={`payment-status ${reg.paymentStatus}`}>
                                                         {reg.paymentStatus.charAt(0).toUpperCase() + reg.paymentStatus.slice(1)}
                                                     </span>
                                                 </td>
-                                                <td>${reg.amount || 0}</td>
+                                                <td>{formatINR(reg.amount || 0)}</td>
                                                 <td>
                                                     <span className={`reg-status ${reg.status || "registered"}`}>
                                                         {reg.status || "Registered"}
@@ -328,6 +322,7 @@ const AdminRegistrations = () => {
                     onReasonChange={(reason) => setRejectModal(prev => ({ ...prev, reason }))}
                 />
             </main>
+            </div>
         </div>
     );
 };

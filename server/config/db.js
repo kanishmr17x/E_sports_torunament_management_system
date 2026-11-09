@@ -10,7 +10,7 @@ try {
 
 let connectionPromise;
 
-const connectDB = async () => {
+const connectDB = async (retries = 5, initialDelay = 1000) => {
     if (mongoose.connection.readyState === 1) {
         return mongoose.connection;
     }
@@ -23,26 +23,31 @@ const connectDB = async () => {
         throw new Error("MONGO_URI is not configured");
     }
 
-    connectionPromise = mongoose.connect(process.env.MONGO_URI, {
-        dbName: "esportsdb",
-        serverSelectionTimeoutMS: 5000
-    })
-        .then(() => {
+    let delay = initialDelay;
+
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            connectionPromise = mongoose.connect(process.env.MONGO_URI, {
+                dbName: process.env.DB_NAME || "esports_db",
+                serverSelectionTimeoutMS: 5000,
+                bufferCommands: false
+            });
+
+            const conn = await connectionPromise;
             mongoose.connection.on('error', (err) => {
                 console.error('❌ MongoDB connection error:', err.message);
             });
-            return mongoose.connection;
-        })
-        .catch((error) => {
+            return conn;
+        } catch (error) {
             connectionPromise = undefined;
-            throw error;
-        });
-
-    try {
-        return await connectionPromise;
-    } catch (error) {
-        console.error("❌ MongoDB connection failed:", error.message);
-        throw error;
+            if (attempt === retries) {
+                console.error(`❌ MongoDB connection failed after ${retries} attempts:`, error.message);
+                throw error;
+            }
+            console.warn(`⚠️ MongoDB connection attempt ${attempt}/${retries} failed. Retrying in ${delay / 1000}s...`);
+            await new Promise(res => setTimeout(res, delay));
+            delay *= 1.5;
+        }
     }
 };
 

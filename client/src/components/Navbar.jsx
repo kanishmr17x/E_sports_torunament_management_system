@@ -22,41 +22,49 @@ const Navbar = () => {
     <header className="nav-root">
       <div className="nav-container">
         {/* Brand */}
-        <Link to="/" className="brand" onClick={closeMenu}>
+        <Link to="/" className="brand" onClick={closeMenu} aria-label="E-SPORTS Home">
           <span className="brand-icon">⚡</span>
-          <span className="brand-accent">E</span>-SPORTS
+          <span className="brand-text">
+            <span className="brand-accent">E</span>-SPORTS
+          </span>
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="nav-links">
-          <NavLink to="/" end className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+        <nav className="nav-links" aria-label="Main Navigation">
+          <NavLink to="/" end className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
             Home
           </NavLink>
-          <NavLink to="/tournaments" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+          <NavLink to="/tournaments" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
             Tournaments
           </NavLink>
-          <NavLink to="/teams" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+          <NavLink to="/bracket" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
+            Bracket
+          </NavLink>
+          <NavLink to="/matches" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
+            Matches
+          </NavLink>
+          <NavLink to="/teams" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
             Teams
           </NavLink>
-          <NavLink to="/players" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+          <NavLink to="/players" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
             Players
           </NavLink>
-          <NavLink to="/leaderboard" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+          <NavLink to="/leaderboard" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
             Leaderboard
           </NavLink>
-          <NavLink to="/contact" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+          <NavLink to="/contact" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
             Contact
           </NavLink>
 
           {/* Authenticated Links */}
           {user && (
-            <NavLink to="/dashboard" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+            <NavLink to="/dashboard" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
               Dashboard
             </NavLink>
           )}
 
           {(isAdmin || isOrganizer) && (
-            <NavLink to="/admin" className={({ isActive }) => isActive ? "nav-link active admin-link" : "nav-link admin-link"}>
+            <NavLink to="/admin" className={({ isActive }) => (isActive ? "nav-link active admin-link" : "nav-link admin-link")}>
               🛡️ Admin
             </NavLink>
           )}
@@ -75,14 +83,14 @@ const Navbar = () => {
                   {user.role || "player"}
                 </span>
               </Link>
-              <button onClick={handleLogout} className="btn btn-outline btn-sm nav-logout-btn" title="Sign Out">
+              <button onClick={handleLogout} className="btn nav-logout-btn" title="Sign Out">
                 Logout
               </button>
             </div>
           ) : (
             <div className="nav-guest-btns">
-              <NavLink to="/login" className="btn btn-outline btn-sm">Login</NavLink>
-              <NavLink to="/signup" className="btn btn-primary btn-sm">Sign Up</NavLink>
+              <NavLink to="/login" className="btn btn-outline nav-btn-login">Login</NavLink>
+              <NavLink to="/signup" className="btn btn-primary nav-btn-signup">Sign Up</NavLink>
             </div>
           )}
         </div>
@@ -109,6 +117,12 @@ const Navbar = () => {
             </NavLink>
             <NavLink to="/tournaments" className="mobile-nav-link" onClick={closeMenu}>
               🏆 Tournaments
+            </NavLink>
+            <NavLink to="/bracket" className="mobile-nav-link" onClick={closeMenu}>
+              ⚔️ Bracket
+            </NavLink>
+            <NavLink to="/matches" className="mobile-nav-link" onClick={closeMenu}>
+              🎯 Matches
             </NavLink>
             <NavLink to="/teams" className="mobile-nav-link" onClick={closeMenu}>
               👥 Teams

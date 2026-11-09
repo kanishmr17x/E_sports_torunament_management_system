@@ -171,11 +171,11 @@ exports.cancelRegistration = asyncHandler(async (req, res) => {
 
     await Registration.findByIdAndDelete(req.params.id);
 
-    // Update tournament registeredTeams count
-    const tournament = registration.tournamentId;
-    tournament.registeredTeams = Math.max(0, (tournament.registeredTeams || 1) - 1);
-    tournament.teams = tournament.teams.filter(t => t.toString() !== registration.teamId._id.toString());
-    await tournament.save();
+    // Update tournament registeredTeams count and remove team reference atomically
+    await Tournament.findByIdAndUpdate(registration.tournamentId._id || registration.tournamentId, {
+        $inc: { registeredTeams: -1 },
+        $pull: { teams: registration.teamId._id || registration.teamId }
+    });
 
     sendResponse(res, successResponse("Registration cancelled successfully"));
 });

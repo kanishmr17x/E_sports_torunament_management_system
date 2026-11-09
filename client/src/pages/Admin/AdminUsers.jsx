@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { getAdminUsers, getUserStats, updateUserRole, deactivateUser, activateUser } from "../../api/apiRoutes";
 import { useAuth } from "../../hooks/useAuth";
 import ConfirmModal from "../../components/ConfirmModal";
+import AdminNav from "../../components/AdminNav";
+import { formatINR, formatDateIST } from "../../utils/formatters";
 import "../../styles/theme.css";
 import "../../styles/adminUsers.css";
 
@@ -137,14 +139,11 @@ const AdminUsers = () => {
 
     return (
         <div className="admin-page">
-            <header className="admin-header">
-                <div className="header-content">
-                    <div>
-                        <h1>👥 User Management</h1>
-                        <p className="subtitle">Manage user accounts, roles, and permissions</p>
-                    </div>
-                </div>
-            </header>
+            <div className="container">
+                <AdminNav
+                    title="User & Role Administration"
+                    subtitle="Manage athlete accounts, assign organizer roles, and oversee IAM permissions."
+                />
 
             <main className="admin-main">
                 {error && <div className="alert alert-error">{error}</div>}
@@ -275,8 +274,8 @@ const AdminUsers = () => {
                                                 <td>{user.teams || 0}</td>
                                                 <td>{user.registrations || 0}</td>
                                                 <td>{user.payments || 0}</td>
-                                                <td>${user.totalSpent || 0}</td>
-                                                <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}</td>
+                                                <td>{formatINR(user.totalSpent || 0)}</td>
+                                                <td>{user.createdAt ? formatDateIST(user.createdAt) : "N/A"}</td>
                                                 <td>
                                                     <div className="action-buttons">
                                                         {(user.isActive !== false) && (
@@ -333,6 +332,7 @@ const AdminUsers = () => {
                     isLoading={deleting}
                 />
             </main>
+            </div>
         </div>
     );
 };

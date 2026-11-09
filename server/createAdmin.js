@@ -14,7 +14,7 @@ const createAdmin = async () => {
       throw new Error('MONGO_URI must be configured');
     }
     await mongoose.connect(process.env.MONGO_URI, {
-      dbName: 'esportsdb'
+      dbName: process.env.DB_NAME || 'esports_db'
     });
     console.log('Connected to MongoDB');
 

@@ -7,6 +7,9 @@ import {
   getRegistrationStats, 
   getPaymentStats 
 } from "../../api/apiRoutes";
+import AdminNav from "../../components/AdminNav";
+import StatCard from "../../components/StatCard";
+import { formatIndianNumber } from "../../utils/formatters";
 import "../../styles/theme.css";
 import "../../styles/reports.css";
 
@@ -56,7 +59,7 @@ const Reports = () => {
           totalRegistrations: regData.total || 0,
           totalRevenue: payData.totalRevenue || 0
         });
-      } catch (err) {
+      } catch {
         // Fallback gracefully
       } finally {
         setLoading(false);
@@ -72,124 +75,147 @@ const Reports = () => {
 
   return (
     <div className="reports-page">
-      {/* Page Header */}
-      <header className="reports-header">
-        <Link to="/admin" className="btn btn-outline btn-sm" style={{ marginBottom: "1rem", display: "inline-flex" }}>
-          ← Back to Admin Console
-        </Link>
-        <h1 className="admin-title">📊 Analytics & Platform Intelligence</h1>
-        <p className="admin-subtitle">
-          Real-time metrics on tournaments, user acquisition, team formations, and platform health.
-        </p>
-      </header>
+      <div className="container">
+        {/* Universal Admin Navigation */}
+        <AdminNav
+          title="Platform Intelligence & Analytics"
+          subtitle="Real-time telemetry on tournaments, user acquisition, team formations, and circuit health."
+          actions={
+            <Link to="/admin" className="btn btn-outline btn-sm">
+              ← Dashboard Overview
+            </Link>
+          }
+        />
 
-      {/* KPI Stats Grid */}
-      <section className="reports-stats-grid">
-        <div className="report-stat-card">
-          <div className="report-stat-icon">🏆</div>
-          <div className="report-stat-value" style={{ color: "var(--neon-cyan)" }}>
-            {loading ? "--" : stats.totalTournaments}
-          </div>
-          <div className="report-stat-label">Tournaments Hosted</div>
-          <div className="report-stat-desc">Brackets created across all titles</div>
-        </div>
+        {/* Telemetry KPI Matrix */}
+        <section className="reports-stats-grid">
+          <StatCard
+            kicker="Tournaments Hosted"
+            value={loading ? "--" : formatIndianNumber(stats.totalTournaments)}
+            icon="🏆"
+            subtitle="Brackets created across all titles"
+            accentColor="rgba(0, 212, 255, 0.4)"
+          />
 
-        <div className="report-stat-card">
-          <div className="report-stat-icon">👥</div>
-          <div className="report-stat-value" style={{ color: "var(--neon-blue)" }}>
-            {loading ? "--" : stats.totalTeams}
-          </div>
-          <div className="report-stat-label">Registered Squads</div>
-          <div className="report-stat-desc">Competitive esports rosters</div>
-        </div>
+          <StatCard
+            kicker="Enlisted Squads"
+            value={loading ? "--" : formatIndianNumber(stats.totalTeams)}
+            icon="👥"
+            subtitle="Competitive esports rosters"
+            accentColor="rgba(118, 87, 255, 0.4)"
+          />
 
-        <div className="report-stat-card">
-          <div className="report-stat-icon">👤</div>
-          <div className="report-stat-value" style={{ color: "var(--neon-purple)" }}>
-            {loading ? "--" : stats.totalUsers}
-          </div>
-          <div className="report-stat-label">Total Platform Users</div>
-          <div className="report-stat-desc">Athletes, captains & organizers</div>
-        </div>
+          <StatCard
+            kicker="Platform Users"
+            value={loading ? "--" : formatIndianNumber(stats.totalUsers)}
+            icon="👤"
+            subtitle="Athletes, captains & organizers"
+            accentColor="rgba(167, 139, 250, 0.4)"
+          />
 
-        <div className="report-stat-card">
-          <div className="report-stat-icon">📝</div>
-          <div className="report-stat-value" style={{ color: "var(--neon-pink)" }}>
-            {loading ? "--" : stats.totalRegistrations}
-          </div>
-          <div className="report-stat-label">Tournament Entries</div>
-          <div className="report-stat-desc">Verified team registrations</div>
-        </div>
-      </section>
+          <StatCard
+            kicker="Tournament Entries"
+            value={loading ? "--" : formatIndianNumber(stats.totalRegistrations)}
+            icon="📝"
+            subtitle="Verified slot reservations"
+            accentColor="rgba(245, 158, 11, 0.4)"
+          />
+        </section>
 
-      {/* Distribution Breakdown Card */}
-      <section className="reports-chart-card">
-        <div className="reports-chart-header">
-          <h2 className="admin-section-heading" style={{ margin: 0 }}>
-            👥 User Role Distribution
-          </h2>
-          <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>
-            Active Accounts
-          </span>
-        </div>
-
-        <div className="distribution-list">
-          <div className="distribution-item">
-            <div className="distribution-meta">
-              <span>🎮 Players & Athletes ({stats.players})</span>
-              <span style={{ color: "var(--neon-cyan)" }}>{playerPercent}%</span>
+        {/* Distribution Breakdown & Circuit Health */}
+        <div className="reports-charts-split">
+          {/* User Role Distribution */}
+          <section className="reports-chart-card">
+            <div className="reports-chart-header">
+              <div>
+                <h3 className="admin-section-heading" style={{ margin: 0 }}>
+                  👥 User Role Demographics
+                </h3>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0.25rem 0 0" }}>
+                  Active verified accounts categorized by operational permissions.
+                </p>
+              </div>
+              <span className="admin-status-tag">
+                <span className="admin-status-pulse"></span> Active Sync
+              </span>
             </div>
-            <div className="distribution-bar-bg">
-              <div
-                className="distribution-bar-fill cyan"
-                style={{ width: `${playerPercent}%` }}
-              ></div>
-            </div>
-          </div>
 
-          <div className="distribution-item">
-            <div className="distribution-meta">
-              <span>🛡️ Tournament Organizers ({stats.organizers})</span>
-              <span style={{ color: "#ffd700" }}>{organizerPercent}%</span>
-            </div>
-            <div className="distribution-bar-bg">
-              <div
-                className="distribution-bar-fill purple"
-                style={{ width: `${organizerPercent}%` }}
-              ></div>
-            </div>
-          </div>
-        </div>
-      </section>
+            <div className="distribution-list">
+              <div className="distribution-item">
+                <div className="distribution-meta">
+                  <span style={{ fontWeight: 700, color: "var(--text-primary)" }}>
+                    🎮 Players & Athletes ({stats.players})
+                  </span>
+                  <span style={{ color: "var(--accent-secondary)", fontWeight: 800 }}>
+                    {playerPercent}%
+                  </span>
+                </div>
+                <div className="distribution-bar-bg">
+                  <div
+                    className="distribution-bar-fill cyan"
+                    style={{ width: `${playerPercent}%` }}
+                  />
+                </div>
+              </div>
 
-      {/* Health & Infrastructure Card */}
-      <section className="reports-chart-card">
-        <div className="reports-chart-header">
-          <h2 className="admin-section-heading" style={{ margin: 0 }}>
-            ⚙️ System Health & Infrastructure
-          </h2>
-          <span className="table-badge open">Online</span>
-        </div>
+              <div className="distribution-item">
+                <div className="distribution-meta">
+                  <span style={{ fontWeight: 700, color: "var(--text-primary)" }}>
+                    🛡️ Tournament Organizers ({stats.organizers})
+                  </span>
+                  <span style={{ color: "var(--accent-primary)", fontWeight: 800 }}>
+                    {organizerPercent}%
+                  </span>
+                </div>
+                <div className="distribution-bar-bg">
+                  <div
+                    className="distribution-bar-fill purple"
+                    style={{ width: `${organizerPercent}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
-          <div>
-            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>API Runtime</span>
-            <div style={{ fontWeight: 700, color: "var(--text-primary)", marginTop: "0.25rem" }}>Node.js / Express</div>
-          </div>
-          <div>
-            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Frontend Framework</span>
-            <div style={{ fontWeight: 700, color: "var(--text-primary)", marginTop: "0.25rem" }}>React 19 / Vite</div>
-          </div>
-          <div>
-            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Data Engine</span>
-            <div style={{ fontWeight: 700, color: "var(--text-primary)", marginTop: "0.25rem" }}>MongoDB / Mongoose</div>
-          </div>
-          <div>
-            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Deployment Target</span>
-            <div style={{ fontWeight: 700, color: "var(--text-primary)", marginTop: "0.25rem" }}>Vercel Full-Stack</div>
-          </div>
+          {/* System Health & Architecture Status */}
+          <section className="reports-chart-card">
+            <div className="reports-chart-header">
+              <div>
+                <h3 className="admin-section-heading" style={{ margin: 0 }}>
+                  ⚙️ System Health & Infrastructure
+                </h3>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0.25rem 0 0" }}>
+                  Core stack runtime and service uptime telemetry.
+                </p>
+              </div>
+              <span className="table-badge open">Operational</span>
+            </div>
+
+            <div className="reports-infra-grid">
+              <div className="infra-tile">
+                <span className="infra-label">API Runtime</span>
+                <span className="infra-value">Node.js Express</span>
+                <span className="infra-sub">REST / Bearer Auth</span>
+              </div>
+              <div className="infra-tile">
+                <span className="infra-label">Frontend</span>
+                <span className="infra-value">React 19 / Vite</span>
+                <span className="infra-sub">Obsidian Cyber Arena</span>
+              </div>
+              <div className="infra-tile">
+                <span className="infra-label">Data Engine</span>
+                <span className="infra-value">MongoDB / Atlas</span>
+                <span className="infra-sub">Schema Strictness</span>
+              </div>
+              <div className="infra-tile">
+                <span className="infra-label">Production Target</span>
+                <span className="infra-value">Vercel Serverless</span>
+                <span className="infra-sub">Edge CDN Global</span>
+              </div>
+            </div>
+          </section>
         </div>
-      </section>
+      </div>
     </div>
   );
 };

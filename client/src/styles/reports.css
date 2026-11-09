@@ -116,3 +116,46 @@
 .distribution-bar-fill.cyan { background: var(--gradient-primary); }
 .distribution-bar-fill.purple { background: var(--gradient-secondary); }
 .distribution-bar-fill.blue { background: var(--gradient-accent); }
+
+
+/* Split row for Analytics */
+.reports-charts-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.reports-infra-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.infra-tile {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.infra-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.infra-value {
+  font-weight: 800;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.infra-sub {
+  font-size: 0.72rem;
+  color: var(--accent-secondary);
+}

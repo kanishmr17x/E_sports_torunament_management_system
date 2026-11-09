@@ -13,7 +13,13 @@ import {
     getProfile
 } from "../../api/apiRoutes";
 import { useAuth } from "../../hooks/useAuth";
+import StatCard from "../../components/StatCard";
+import TournamentCard from "../../components/TournamentCard";
+import MatchCard from "../../components/MatchCard";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import { formatTimeIST } from "../../utils/formatters";
 import "../../styles/theme.css";
+import "../../styles/components.css";
 import "../../styles/dashboard.css";
 
 const UserDashboard = () => {
@@ -34,6 +40,7 @@ const UserDashboard = () => {
 
     useEffect(() => {
         const fetchDashboardData = async () => {
+            if (authLoading) return;
             if (!user) {
                 navigate("/login");
                 return;
@@ -62,23 +69,23 @@ const UserDashboard = () => {
 
                 setData({
                     profile: profileRes.status === "fulfilled" ? profileRes.value : null,
-                    teams: teamsRes.status === "fulfilled" ? teamsRes.value : [],
-                    registrations: regsRes.status === "fulfilled" ? regsRes.value : [],
-                    payments: paymentsRes.status === "fulfilled" ? paymentsRes.value : [],
-                    upcomingMatches: upcomingMatchesRes.status === "fulfilled" ? upcomingMatchesRes.value : [],
-                    completedMatches: completedMatchesRes.status === "fulfilled" ? completedMatchesRes.value : [],
-                    notifications: notificationsRes.status === "fulfilled" ? notificationsRes.value : [],
+                    teams: teamsRes.status === "fulfilled" && Array.isArray(teamsRes.value) ? teamsRes.value : [],
+                    registrations: regsRes.status === "fulfilled" && Array.isArray(regsRes.value) ? regsRes.value : [],
+                    payments: paymentsRes.status === "fulfilled" && Array.isArray(paymentsRes.value) ? paymentsRes.value : [],
+                    upcomingMatches: upcomingMatchesRes.status === "fulfilled" && Array.isArray(upcomingMatchesRes.value) ? upcomingMatchesRes.value : [],
+                    completedMatches: completedMatchesRes.status === "fulfilled" && Array.isArray(completedMatchesRes.value) ? completedMatchesRes.value : [],
+                    notifications: notificationsRes.status === "fulfilled" && Array.isArray(notificationsRes.value) ? notificationsRes.value : [],
                     unreadCount: unreadCountRes.status === "fulfilled" ? unreadCountRes.value?.count || 0 : 0
                 });
             } catch (err) {
-                setError(err.message || "Failed to load dashboard");
+                setError(err.message || "Failed to load dashboard data");
             } finally {
                 setLoading(false);
             }
         };
 
         fetchDashboardData();
-    }, [user, navigate]);
+    }, [user, authLoading, navigate]);
 
     const handleMarkAllRead = async () => {
         try {
@@ -89,7 +96,20 @@ const UserDashboard = () => {
                 unreadCount: 0
             }));
         } catch (err) {
-            console.error("Failed to mark all read:", err);
+            console.error("Failed to mark all as read:", err);
+        }
+    };
+
+    const handleMarkOneRead = async (id) => {
+        try {
+            await markNotificationRead(id);
+            setData(prev => ({
+                ...prev,
+                notifications: prev.notifications.map(n => n._id === id ? { ...n, isRead: true } : n),
+                unreadCount: Math.max(0, prev.unreadCount - 1)
+            }));
+        } catch (err) {
+            console.error("Failed to mark as read:", err);
         }
     };
 
@@ -100,10 +120,10 @@ const UserDashboard = () => {
 
     if (authLoading || loading) {
         return (
-            <div className="dashboard-page loading">
-                <div className="dashboard-loader">
+            <div className="dashboard-page-pro loading">
+                <div className="dashboard-loader-pro">
                     <div className="spinner"></div>
-                    <p>Loading your dashboard...</p>
+                    <p>Loading Athlete Headquarters...</p>
                 </div>
             </div>
         );
@@ -111,11 +131,13 @@ const UserDashboard = () => {
 
     if (error) {
         return (
-            <div className="dashboard-page error">
-                <div className="dashboard-error">
-                    <h2>⚠️ Error Loading Dashboard</h2>
+            <div className="dashboard-page-pro error">
+                <div className="dashboard-error-card">
+                    <h2>⚠️ Dashboard Telemetry Error</h2>
                     <p>{error}</p>
-                    <button onClick={() => window.location.reload()} className="btn btn-primary">Retry</button>
+                    <button onClick={() => window.location.reload()} className="btn btn-primary">
+                        Reconnect
+                    </button>
                 </div>
             </div>
         );
@@ -123,297 +145,329 @@ const UserDashboard = () => {
 
     const upcomingRegs = data.registrations.filter(r => {
         const tourney = r.tournamentId;
-        return tourney && (tourney.status === "registration_open" || tourney.status === "live" || tourney.status === "upcoming");
-    }).slice(0, 5);
-
-    const _completedRegs = data.registrations.filter(r => {
-        const tourney = r.tournamentId;
-        return tourney && tourney.status === "completed";
-    }).slice(0, 5);
+        return tourney && (tourney.status === "registration_open" || tourney.status === "live" || tourney.status === "open" || tourney.status === "upcoming");
+    });
 
     const pendingPayments = data.payments.filter(p => p.status === "pending" || p.status === "processing");
-    const completedPayments = data.payments.filter(p => p.status === "paid").slice(0, 5);
 
     return (
-        <div className="dashboard-page">
-            <header className="dashboard-header">
-                <div className="dashboard-header-content">
-                    <div className="welcome-section">
-                        <h1>Welcome back, <span className="username">{user?.username || "Player"}</span>! 🎮</h1>
-                        <p className="subtitle">Manage your teams, tournaments, and track your esports journey</p>
+        <div className="dashboard-page-pro">
+            <div className="container">
+                <Breadcrumbs items={[{ label: "Player Headquarters" }]} />
+
+                {/* =========================================================================
+                    1. ATHLETE PROFILE BANNER & COMMAND BAR
+                    ========================================================================= */}
+                <header className="athlete-profile-banner">
+                    <div className="athlete-profile-left">
+                        <div className="athlete-avatar-pro">
+                            {user?.username ? user.username.charAt(0).toUpperCase() : "P"}
+                        </div>
+                        <div className="athlete-info-col">
+                            <div className="athlete-title-row">
+                                <h1 className="athlete-ign">{user?.username || "Player"}</h1>
+                                <span className={`athlete-role-badge ${user?.role || "player"}`}>
+                                    {user?.role?.toUpperCase() || "PLAYER"}
+                                </span>
+                                <span className="athlete-verified-badge" title="Identity Verified">
+                                    ✓ Verified
+                                </span>
+                            </div>
+                            <p className="athlete-meta">
+                                <span>📧 {user?.email}</span>
+                                <span>🏆 Competitive Tier: Pro Division</span>
+                                <span>🛡️ Squads Active: {data.teams.length}</span>
+                            </p>
+                        </div>
                     </div>
-                    <div className="header-actions">
-                        <span className={`role-badge ${user?.role}`}>{user?.role?.toUpperCase() || "PLAYER"}</span>
-                        <button onClick={handleLogout} className="btn btn-outline">Logout</button>
+
+                    <div className="athlete-profile-actions">
+                        <Link to="/team-management" className="btn btn-primary btn-sm">
+                            + Create Squad
+                        </Link>
+                        <Link to="/tournaments" className="btn btn-outline btn-sm">
+                            Join Tournament
+                        </Link>
+                        <button onClick={handleLogout} className="btn btn-ghost btn-sm" title="Log Out">
+                            Logout
+                        </button>
                     </div>
-                </div>
-            </header>
+                </header>
 
-            <main className="dashboard-main">
-                <div className="dashboard-grid">
-                    {/* Quick Stats */}
-                    <section className="stats-section">
-                        <h2 className="section-title">📊 Quick Stats</h2>
-                        <div className="stats-grid">
-                            <div className="stat-card">
-                                <div className="stat-icon teams">👥</div>
-                                <div className="stat-info">
-                                    <div className="stat-value">{data.teams.length}</div>
-                                    <div className="stat-label">Your Teams</div>
-                                </div>
-                            </div>
-                            <div className="stat-card">
-                                <div className="stat-icon tournaments">🏆</div>
-                                <div className="stat-info">
-                                    <div className="stat-value">{data.registrations.length}</div>
-                                    <div className="stat-label">Tournaments Joined</div>
-                                </div>
-                            </div>
-                            <div className="stat-card">
-                                <div className="stat-icon matches">🎮</div>
-                                <div className="stat-info">
-                                    <div className="stat-value">{data.upcomingMatches.length}</div>
-                                    <div className="stat-label">Upcoming Matches</div>
-                                </div>
-                            </div>
-                            <div className="stat-card">
-                                <div className="stat-icon payments">💰</div>
-                                <div className="stat-info">
-                                    <div className="stat-value">{pendingPayments.length}</div>
-                                    <div className="stat-label">Pending Payments</div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                {/* =========================================================================
+                    2. TELEMETRY METRIC TILES
+                    ========================================================================= */}
+                <section className="dashboard-kpi-grid">
+                    <StatCard
+                        label="Registered Squads"
+                        value={data.teams.length}
+                        subtext="Active competitive rosters"
+                        icon="🛡️"
+                        trend={data.teams.length > 0 ? "Lineup ready" : "Create a squad"}
+                        trendDirection="up"
+                        accent="violet"
+                        progress={data.teams.length > 0 ? 100 : 25}
+                    />
+                    <StatCard
+                        label="Active Tournaments"
+                        value={upcomingRegs.length}
+                        subtext="Circuits entered"
+                        icon="🏆"
+                        trend={`${data.registrations.length} Total Registered`}
+                        trendDirection="up"
+                        accent="cyan"
+                        progress={Math.min(100, upcomingRegs.length * 25)}
+                    />
+                    <StatCard
+                        label="Scheduled Fixtures"
+                        value={data.upcomingMatches.length}
+                        subtext="Pending match rounds"
+                        icon="⚔️"
+                        trend={data.upcomingMatches.length > 0 ? "Upcoming battle" : "No matches pending"}
+                        trendDirection={data.upcomingMatches.length > 0 ? "up" : "neutral"}
+                        accent="gold"
+                        progress={data.upcomingMatches.length > 0 ? 80 : 0}
+                    />
+                    <StatCard
+                        label="Entry Invoices"
+                        value={pendingPayments.length}
+                        subtext={pendingPayments.length > 0 ? "Action required" : "All accounts clear"}
+                        icon="💳"
+                        trend={pendingPayments.length > 0 ? "Pending payment" : "Zero balance"}
+                        trendDirection={pendingPayments.length > 0 ? "down" : "neutral"}
+                        accent={pendingPayments.length > 0 ? "danger" : "cyan"}
+                        progress={pendingPayments.length > 0 ? 40 : 100}
+                    />
+                </section>
 
-                    {/* Notifications */}
-                    <section className="notifications-section">
-                        <div className="section-header">
-                            <h2 className="section-title">🔔 Notifications</h2>
-                            {data.unreadCount > 0 && (
-                                <button onClick={handleMarkAllRead} className="btn btn-sm btn-outline">
-                                    Mark all read ({data.unreadCount})
-                                </button>
-                            )}
-                        </div>
-                        <div className="notifications-list">
-                            {data.notifications.length === 0 ? (
-                                <p className="empty-state">No notifications yet</p>
-                            ) : (
-                                data.notifications.map(notification => (
-                                    <div key={notification._id} className={`notification-item ${!notification.isRead ? "unread" : ""}`}>
-                                        <div className="notification-icon">
-                                            {getNotificationIcon(notification.type)}
-                                        </div>
-                                        <div className="notification-content">
-                                            <div className="notification-title">{notification.title}</div>
-                                            <div className="notification-message">{notification.message}</div>
-                                            <div className="notification-time">
-                                                {new Date(notification.createdAt).toLocaleString()}
-                                            </div>
-                                        </div>
-                                        {!notification.isRead && (
-                                            <button
-                                                onClick={() => markNotificationAsRead(notification._id, setData)}
-                                                className="btn btn-sm btn-primary"
-                                            >
-                                                Mark Read
-                                            </button>
-                                        )}
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </section>
-
-                    {/* My Teams */}
-                    <section className="teams-section">
-                        <div className="section-header">
-                            <h2 className="section-title">👥 My Teams</h2>
-                            <Link to="/dashboard/teams" className="btn btn-primary btn-sm">Create Team</Link>
-                        </div>
-                        <div className="teams-grid">
-                            {data.teams.length === 0 ? (
-                                <div className="empty-state-card">
-                                    <p>You haven't created any teams yet</p>
-                                    <Link to="/dashboard/teams" className="btn btn-primary">Create Your First Team</Link>
+                {/* =========================================================================
+                    3. DELIBERATE 2-COLUMN ASYMMETRIC GRID (8 / 4 Split)
+                    ========================================================================= */}
+                <div className="dashboard-asymmetric-grid">
+                    {/* LEFT / MAIN COLUMN (2fr) */}
+                    <div className="dashboard-main-col">
+                        {/* Active Circuit Entries */}
+                        <section className="dash-section-card">
+                            <div className="dash-section-header">
+                                <div className="dash-header-title-wrap">
+                                    <span className="dash-kicker">COMPETITIVE SLATE</span>
+                                    <h2 className="dash-section-title">Active Tournament Entries</h2>
                                 </div>
-                            ) : (
-                                data.teams.map(team => (
-                                    <div key={team._id} className="team-card">
-                                        <div className="team-card-header">
-                                            <h3>{team.teamName}</h3>
-                                            <span className="team-game">{team.game}</span>
-                                        </div>
-                                        <div className="team-card-body">
-                                            <div className="team-info">
-                                                <span>Tournament: {team.tournament?.name || "N/A"}</span>
-                                                <span>Members: {team.totalMembers || 0}</span>
-                                                <span>Status: <span className={`status-badge ${team.status}`}>{team.status}</span></span>
-                                            </div>
-                                        </div>
-                                        <div className="team-card-actions">
-                                            <Link to={`/teams/${team._id}`} className="btn btn-outline btn-sm">View Details</Link>
-                                            <Link to={`/dashboard/teams/${team._id}/manage`} className="btn btn-primary btn-sm">Manage</Link>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </section>
+                                <Link to="/tournaments" className="btn btn-outline btn-sm">
+                                    Browse Arenas →
+                                </Link>
+                            </div>
 
-                    {/* Active Tournaments */}
-                    <section className="tournaments-section">
-                        <div className="section-header">
-                            <h2 className="section-title">🏆 Active Tournaments</h2>
-                            <Link to="/tournaments" className="btn btn-outline btn-sm">Browse All</Link>
-                        </div>
-                        <div className="tournaments-list">
                             {upcomingRegs.length === 0 ? (
-                                <p className="empty-state">No active tournaments. <Link to="/tournaments">Browse tournaments</Link> to join!</p>
+                                <div className="dash-empty-state">
+                                    <span className="empty-ico">🏆</span>
+                                    <h3>No Active Tournaments</h3>
+                                    <p>Your squads are not registered for any upcoming tournaments right now.</p>
+                                    <Link to="/tournaments" className="btn btn-primary btn-sm">
+                                        Explore Open Tournaments
+                                    </Link>
+                                </div>
                             ) : (
-                                upcomingRegs.map(reg => {
-                                    const tourney = reg.tournamentId;
-                                    const payment = data.payments.find(p => p.tournamentId?._id === tourney._id || p.tournamentId === tourney._id);
-                                    return (
-                                        <div key={reg._id} className="tournament-item">
-                                            <div className="tournament-info">
-                                                <h4>{tourney?.name || "Unknown Tournament"}</h4>
-                                                <div className="tournament-meta">
-                                                    <span>🎮 {tourney?.game}</span>
-                                                    <span>📅 {tourney?.startDate ? new Date(tourney.startDate).toLocaleDateString() : "TBD"}</span>
-                                                    <span className={`status-badge ${tourney?.status}`}>{tourney?.status?.replace("_", " ")}</span>
-                                                </div>
-                                            </div>
-                                            <div className="tournament-actions">
-                                                {payment && payment.status !== "paid" && (
-                                                    <Link to={`/payment/${payment._id}`} className="btn btn-primary btn-sm">
-                                                        {payment.status === "pending" ? "Pay Now" : "Complete Payment"}
-                                                    </Link>
-                                                )}
-                                                <Link to={`/tournaments/${tourney?._id}`} className="btn btn-outline btn-sm">Details</Link>
-                                            </div>
-                                        </div>
-                                    );
-                                })
+                                <div className="dash-tournaments-list">
+                                    {upcomingRegs.map(reg => {
+                                        const tourney = reg.tournamentId;
+                                        if (!tourney) return null;
+                                        return (
+                                            <TournamentCard
+                                                key={reg._id}
+                                                tournament={tourney}
+                                                variant="horizontal"
+                                            />
+                                        );
+                                    })}
+                                </div>
                             )}
-                        </div>
-                    </section>
+                        </section>
 
-                    {/* Upcoming Matches */}
-                    <section className="matches-section">
-                        <div className="section-header">
-                            <h2 className="section-title">📅 Upcoming Matches</h2>
-                            <Link to="/matches" className="btn btn-outline btn-sm">View All</Link>
-                        </div>
-                        <div className="matches-list">
+                        {/* Upcoming Match Schedule */}
+                        <section className="dash-section-card">
+                            <div className="dash-section-header">
+                                <div className="dash-header-title-wrap">
+                                    <span className="dash-kicker">BATTLE TIMELINE</span>
+                                    <h2 className="dash-section-title">Upcoming Match Schedule</h2>
+                                </div>
+                                <Link to="/matches" className="btn btn-outline btn-sm">
+                                    View Full Schedule →
+                                </Link>
+                            </div>
+
                             {data.upcomingMatches.length === 0 ? (
-                                <p className="empty-state">No upcoming matches scheduled</p>
+                                <div className="dash-empty-state">
+                                    <span className="empty-ico">📅</span>
+                                    <h3>No Upcoming Matches</h3>
+                                    <p>Fixtures will appear here once brackets are generated by organizers.</p>
+                                </div>
                             ) : (
-                                data.upcomingMatches.slice(0, 5).map(match => (
-                                    <div key={match._id} className="match-item">
-                                        <div className="match-teams">
-                                            <span className="team-name">{match.team1?.teamName || "TBD"}</span>
-                                            <span className="vs">vs</span>
-                                            <span className="team-name">{match.team2?.teamName || "TBD"}</span>
-                                        </div>
-                                        <div className="match-meta">
-                                            <span>🏆 {match.tournamentId?.name || "Tournament"}</span>
-                                            <span>📅 {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString() : "TBD"}</span>
-                                            <span className={`status-badge ${match.status}`}>{match.status}</span>
-                                        </div>
-                                    </div>
-                                ))
+                                <div className="dash-matches-grid">
+                                    {data.upcomingMatches.slice(0, 4).map(match => (
+                                        <MatchCard
+                                            key={match._id}
+                                            match={match}
+                                            variant="standard"
+                                        />
+                                    ))}
+                                </div>
                             )}
-                        </div>
-                    </section>
+                        </section>
 
-                    {/* Recent Results */}
-                    <section className="results-section">
-                        <div className="section-header">
-                            <h2 className="section-title">🏁 Recent Results</h2>
-                            <Link to="/results" className="btn btn-outline btn-sm">View All</Link>
-                        </div>
-                        <div className="results-list">
+                        {/* Recent Match Performance Log */}
+                        <section className="dash-section-card">
+                            <div className="dash-section-header">
+                                <div className="dash-header-title-wrap">
+                                    <span className="dash-kicker">HISTORICAL LOG</span>
+                                    <h2 className="dash-section-title">Recent Battle Results</h2>
+                                </div>
+                                <Link to="/results" className="btn btn-outline btn-sm">
+                                    All Results →
+                                </Link>
+                            </div>
+
                             {data.completedMatches.length === 0 ? (
-                                <p className="empty-state">No completed matches yet</p>
+                                <div className="dash-empty-state">
+                                    <span className="empty-ico">🏁</span>
+                                    <h3>No Match History</h3>
+                                    <p>Completed tournament matches will log here automatically.</p>
+                                </div>
                             ) : (
-                                data.completedMatches.map(match => (
-                                    <div key={match._id} className="result-item">
-                                        <div className="result-teams">
-                                            <span className="team-name">{match.team1?.teamName || "TBD"}</span>
-                                            <span className="score">{match.team1Score} - {match.team2Score}</span>
-                                            <span className="team-name">{match.team2?.teamName || "TBD"}</span>
-                                        </div>
-                                        <div className="result-meta">
-                                            <span>🏆 {match.tournamentId?.name || "Tournament"}</span>
-                                            <span>🏅 Winner: {match.winner?.teamName || "Draw"}</span>
-                                            <span>📅 {match.scheduledAt ? new Date(match.scheduledAt).toLocaleDateString() : "TBD"}</span>
-                                        </div>
-                                    </div>
-                                ))
+                                <div className="dash-matches-grid">
+                                    {data.completedMatches.slice(0, 4).map(match => (
+                                        <MatchCard
+                                            key={match._id}
+                                            match={match}
+                                            variant="standard"
+                                        />
+                                    ))}
+                                </div>
                             )}
-                        </div>
-                    </section>
+                        </section>
+                    </div>
 
-                    {/* Payment History */}
-                    <section className="payments-section">
-                        <div className="section-header">
-                            <h2 className="section-title">💳 Payment History</h2>
-                        </div>
-                        <div className="payments-list">
-                            {completedPayments.length === 0 && pendingPayments.length === 0 ? (
-                                <p className="empty-state">No payment history</p>
+                    {/* RIGHT / SIDEBAR COLUMN (1fr) */}
+                    <aside className="dashboard-sidebar-col">
+                        {/* My Teams Quick Command */}
+                        <section className="dash-side-panel">
+                            <div className="dash-side-header">
+                                <h3 className="side-panel-title">🛡️ My Squads ({data.teams.length})</h3>
+                                <Link to="/team-management" className="btn btn-primary btn-xs">
+                                    + New
+                                </Link>
+                            </div>
+
+                            {data.teams.length === 0 ? (
+                                <div className="side-empty-state">
+                                    <p>No squads assembled yet.</p>
+                                    <Link to="/team-management" className="btn btn-outline btn-sm">
+                                        Form a Team
+                                    </Link>
+                                </div>
                             ) : (
-                                [...pendingPayments, ...completedPayments].map(payment => (
-                                    <div key={payment._id} className="payment-item">
-                                        <div className="payment-info">
-                                            <h4>{payment.tournamentId?.name || "Tournament"}</h4>
-                                            <span>Team: {payment.teamId?.teamName || "Unknown"}</span>
+                                <div className="side-squads-list">
+                                    {data.teams.map(team => (
+                                        <div key={team._id} className="side-squad-row">
+                                            <div className="side-squad-avatar">
+                                                {team.teamName ? team.teamName.charAt(0).toUpperCase() : "S"}
+                                            </div>
+                                            <div className="side-squad-info">
+                                                <h4 className="side-squad-name">{team.teamName}</h4>
+                                                <span className="side-squad-meta">
+                                                    {team.game} • {team.totalMembers || 0} Members
+                                                </span>
+                                            </div>
+                                            <Link to={`/teams/${team._id}`} className="btn btn-outline btn-xs">
+                                                Dossier
+                                            </Link>
                                         </div>
-                                        <div className="payment-details">
-                                            <span className="amount">${payment.amount}</span>
-                                            <span className={`status-badge ${payment.status}`}>
-                                                {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+
+                        {/* Notifications Hub */}
+                        <section className="dash-side-panel">
+                            <div className="dash-side-header">
+                                <div className="side-title-with-pill">
+                                    <h3 className="side-panel-title">🔔 Tactical Intel</h3>
+                                    {data.unreadCount > 0 && (
+                                        <span className="unread-counter-pill">
+                                            {data.unreadCount} New
+                                        </span>
+                                    )}
+                                </div>
+                                {data.unreadCount > 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={handleMarkAllRead}
+                                        className="btn btn-ghost btn-xs"
+                                    >
+                                        Clear All
+                                    </button>
+                                )}
+                            </div>
+
+                            {data.notifications.length === 0 ? (
+                                <p className="side-empty-msg">Zero unread dispatches. All quiet on the circuit.</p>
+                            ) : (
+                                <div className="side-notifications-feed">
+                                    {data.notifications.slice(0, 5).map(n => (
+                                        <div
+                                            key={n._id}
+                                            className={`side-notif-item ${!n.isRead ? "unread" : ""}`}
+                                        >
+                                            <div className="notif-header-row">
+                                                <span className="notif-title">{n.title || "Dispatch"}</span>
+                                                {!n.isRead && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleMarkOneRead(n._id)}
+                                                        className="notif-mark-btn"
+                                                        title="Mark read"
+                                                    >
+                                                        ✓
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <p className="notif-body">{n.message}</p>
+                                            <span className="notif-date">
+                                                {formatTimeIST(n.createdAt)} IST
                                             </span>
                                         </div>
-                                    </div>
-                                ))
+                                    ))}
+                                </div>
                             )}
-                        </div>
-                    </section>
+                        </section>
+
+                        {/* Quick Action Shortcuts */}
+                        <section className="dash-side-panel quick-links-panel">
+                            <h3 className="side-panel-title">⚡ Command Shortcuts</h3>
+                            <div className="quick-actions-list">
+                                <Link to="/bracket" className="quick-action-link">
+                                    <span>🏆 Bracket Visualizer</span>
+                                    <span className="quick-arrow">→</span>
+                                </Link>
+                                <Link to="/leaderboard" className="quick-action-link">
+                                    <span>📈 Circuit Standings</span>
+                                    <span className="quick-arrow">→</span>
+                                </Link>
+                                <Link to="/matches" className="quick-action-link">
+                                    <span>⚔️ Match Fixtures</span>
+                                    <span className="quick-arrow">→</span>
+                                </Link>
+                                <Link to="/contact" className="quick-action-link">
+                                    <span>🛡️ Contact Tournament Admin</span>
+                                    <span className="quick-arrow">→</span>
+                                </Link>
+                            </div>
+                        </section>
+                    </aside>
                 </div>
-            </main>
+            </div>
         </div>
     );
 };
-
-function getNotificationIcon(type) {
-    const icons = {
-        registration_confirmed: "✅",
-        payment_confirmed: "💰",
-        payment_failed: "❌",
-        match_scheduled: "📅",
-        match_updated: "🔄",
-        match_result: "🏁",
-        tournament_status_changed: "🏆",
-        team_invite: "👥",
-        general: "📢"
-    };
-    return icons[type] || "📢";
-}
-
-async function markNotificationAsRead(id, setData) {
-    try {
-        await markNotificationRead(id);
-        setData(prev => ({
-            ...prev,
-            notifications: prev.notifications.map(n => n._id === id ? { ...n, isRead: true } : n),
-            unreadCount: Math.max(0, prev.unreadCount - 1)
-        }));
-    } catch (err) {
-        console.error("Failed to mark read:", err);
-    }
-}
 
 export default UserDashboard;

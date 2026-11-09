@@ -58,13 +58,14 @@ const Footer = () => {
         {/* Footer Bottom Bar */}
         <div className="footer-bottom-bar">
           <p className="footer-copyright">
-            © 2026 E-Sports Tournament Platform. Engineered for competitive excellence.
+            © 2026 E-Sports Tournament Platform India. Engineered for competitive excellence • Asia/Kolkata (IST).
           </p>
           <div className="footer-bottom-badges">
             <span className="footer-tag">BGMI</span>
-            <span className="footer-tag">Valorant</span>
-            <span className="footer-tag">Free Fire</span>
-            <span className="footer-tag">Call of Duty</span>
+            <span className="footer-tag">Free Fire India</span>
+            <span className="footer-tag">Valorant India</span>
+            <span className="footer-tag">Counter-Strike 2</span>
+            <span className="footer-tag">All-India Circuit</span>
           </div>
         </div>
       </div>
