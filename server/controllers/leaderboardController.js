@@ -26,7 +26,7 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
 
     const teamStats = {};
 
-    for (const team of tournament.teams) {
+    for (const team of tournament.teams || []) {
         const teamId = team.toString();
         teamStats[teamId] = {
             teamId,
@@ -42,26 +42,29 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
     }
 
     for (const match of matches) {
-        const team1Id = match.team1._id.toString();
-        const team2Id = match.team2._id.toString();
+        // Protect against deleted / null teams in match
+        if (!match.team1 || !match.team2) continue;
+
+        const team1Id = (match.team1._id || match.team1).toString();
+        const team2Id = (match.team2._id || match.team2).toString();
 
         if (!teamStats[team1Id]) {
-            teamStats[team1Id] = { teamId: team1Id, teamName: match.team1.teamName, matches: 0, wins: 0, losses: 0, draws: 0, points: 0, scoreFor: 0, scoreAgainst: 0 };
+            teamStats[team1Id] = { teamId: team1Id, teamName: match.team1.teamName || "Unknown Team", matches: 0, wins: 0, losses: 0, draws: 0, points: 0, scoreFor: 0, scoreAgainst: 0 };
         }
         if (!teamStats[team2Id]) {
-            teamStats[team2Id] = { teamId: team2Id, teamName: match.team2.teamName, matches: 0, wins: 0, losses: 0, draws: 0, points: 0, scoreFor: 0, scoreAgainst: 0 };
+            teamStats[team2Id] = { teamId: team2Id, teamName: match.team2.teamName || "Unknown Team", matches: 0, wins: 0, losses: 0, draws: 0, points: 0, scoreFor: 0, scoreAgainst: 0 };
         }
 
-        teamStats[team1Id].teamName = match.team1.teamName;
-        teamStats[team2Id].teamName = match.team2.teamName;
+        teamStats[team1Id].teamName = match.team1.teamName || teamStats[team1Id].teamName;
+        teamStats[team2Id].teamName = match.team2.teamName || teamStats[team2Id].teamName;
 
         teamStats[team1Id].matches++;
         teamStats[team2Id].matches++;
 
-        teamStats[team1Id].scoreFor += match.team1Score;
-        teamStats[team1Id].scoreAgainst += match.team2Score;
-        teamStats[team2Id].scoreFor += match.team2Score;
-        teamStats[team2Id].scoreAgainst += match.team1Score;
+        teamStats[team1Id].scoreFor += (match.team1Score || 0);
+        teamStats[team1Id].scoreAgainst += (match.team2Score || 0);
+        teamStats[team2Id].scoreFor += (match.team2Score || 0);
+        teamStats[team2Id].scoreAgainst += (match.team1Score || 0);
 
         if (match.result === "team1_win") {
             teamStats[team1Id].wins++;
@@ -79,8 +82,9 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
         }
     }
 
+    const tournamentTeamsList = (tournament.teams || []).map(t => t.toString());
     const leaderboard = Object.values(teamStats)
-        .filter(t => t.matches > 0 || tournament.teams.includes(t.teamId))
+        .filter(t => t.matches > 0 || tournamentTeamsList.includes(t.teamId))
         .sort((a, b) => {
             if (b.points !== a.points) return b.points - a.points;
             const diffA = a.scoreFor - a.scoreAgainst;
@@ -102,7 +106,11 @@ exports.getLeaderboard = asyncHandler(async (req, res) => {
 });
 
 exports.getAllTournamentsLeaderboard = asyncHandler(async (req, res) => {
-    const tournaments = await Tournament.find({ isDeleted: false, status: { $in: ["ongoing", "completed"] } });
+    // Include both 'live' and 'ongoing' for model enum compatibility
+    const tournaments = await Tournament.find({
+        isDeleted: false,
+        status: { $in: ["live", "ongoing", "completed"] }
+    });
 
     const results = [];
 
@@ -114,7 +122,7 @@ exports.getAllTournamentsLeaderboard = asyncHandler(async (req, res) => {
 
         const teamStats = {};
 
-        for (const team of tournament.teams) {
+        for (const team of tournament.teams || []) {
             const teamId = team.toString();
             teamStats[teamId] = {
                 teamId,
@@ -130,26 +138,28 @@ exports.getAllTournamentsLeaderboard = asyncHandler(async (req, res) => {
         }
 
         for (const match of matches) {
-            const team1Id = match.team1._id.toString();
-            const team2Id = match.team2._id.toString();
+            if (!match.team1 || !match.team2) continue;
+
+            const team1Id = (match.team1._id || match.team1).toString();
+            const team2Id = (match.team2._id || match.team2).toString();
 
             if (!teamStats[team1Id]) {
-                teamStats[team1Id] = { teamId: team1Id, teamName: match.team1.teamName, matches: 0, wins: 0, losses: 0, draws: 0, points: 0, scoreFor: 0, scoreAgainst: 0 };
+                teamStats[team1Id] = { teamId: team1Id, teamName: match.team1.teamName || "Unknown Team", matches: 0, wins: 0, losses: 0, draws: 0, points: 0, scoreFor: 0, scoreAgainst: 0 };
             }
             if (!teamStats[team2Id]) {
-                teamStats[team2Id] = { teamId: team2Id, teamName: match.team2.teamName, matches: 0, wins: 0, losses: 0, draws: 0, points: 0, scoreFor: 0, scoreAgainst: 0 };
+                teamStats[team2Id] = { teamId: team2Id, teamName: match.team2.teamName || "Unknown Team", matches: 0, wins: 0, losses: 0, draws: 0, points: 0, scoreFor: 0, scoreAgainst: 0 };
             }
 
-            teamStats[team1Id].teamName = match.team1.teamName;
-            teamStats[team2Id].teamName = match.team2.teamName;
+            teamStats[team1Id].teamName = match.team1.teamName || teamStats[team1Id].teamName;
+            teamStats[team2Id].teamName = match.team2.teamName || teamStats[team2Id].teamName;
 
             teamStats[team1Id].matches++;
             teamStats[team2Id].matches++;
 
-            teamStats[team1Id].scoreFor += match.team1Score;
-            teamStats[team1Id].scoreAgainst += match.team2Score;
-            teamStats[team2Id].scoreFor += match.team2Score;
-            teamStats[team2Id].scoreAgainst += match.team1Score;
+            teamStats[team1Id].scoreFor += (match.team1Score || 0);
+            teamStats[team1Id].scoreAgainst += (match.team2Score || 0);
+            teamStats[team2Id].scoreFor += (match.team2Score || 0);
+            teamStats[team2Id].scoreAgainst += (match.team1Score || 0);
 
             if (match.result === "team1_win") {
                 teamStats[team1Id].wins++;

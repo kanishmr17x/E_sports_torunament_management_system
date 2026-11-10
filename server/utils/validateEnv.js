@@ -39,6 +39,11 @@ const validateEnvironment = () => {
     console.warn('⚠️  WARNING: JWT_SECRET should be at least 32 characters long for security');
   }
 
+  if (process.env.NODE_ENV === 'production' && process.env.DB_NAME === 'esports_db') {
+    console.error("❌ CRITICAL: Production cannot use development database 'esports_db'. Set DB_NAME=esports_db_prod.");
+    process.exit(1);
+  }
+
   console.log('✅ Environment variables validated successfully');
 };
 

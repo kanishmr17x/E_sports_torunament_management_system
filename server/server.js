@@ -1,8 +1,10 @@
 const dotenv = require("dotenv");
 dotenv.config();
 
+const mongoose = require("mongoose");
 const app = require("./app");
 const connectDB = require("./config/db");
+const { validateEnvironment } = require("./utils/validateEnv");
 
 const PORT = process.env.PORT || 5000;
 
@@ -11,16 +13,24 @@ const PORT = process.env.PORT || 5000;
 // invoked as a serverless function via api/index.js.
 const startServer = async () => {
     try {
+        validateEnvironment();
         await connectDB();
         const server = app.listen(PORT, () => {
             console.log(`🚀 E-Sports API running on http://localhost:${PORT}`);
             console.log(`👉 Environment: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`👉 Database: Connected to esports_db`);
+            console.log(`👉 Database: Connected to ${mongoose.connection.name || 'database'}`);
         });
 
         // Graceful shutdown
         const shutdown = () => {
-            server.close(() => process.exit(0));
+            server.close(async () => {
+                try {
+                    await mongoose.connection.close(false);
+                } catch (e) {
+                    // ignore
+                }
+                process.exit(0);
+            });
             setTimeout(() => process.exit(1), 10000).unref();
         };
 
@@ -29,7 +39,7 @@ const startServer = async () => {
 
         return server;
     } catch (err) {
-        console.error("❌ Failed to start server due to database connection error:", err.message);
+        console.error("❌ Failed to start server due to startup error:", err.message);
         process.exit(1);
     }
 };

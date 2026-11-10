@@ -9,9 +9,10 @@ exports.getAllUsers = asyncHandler(async (req, res) => {
     const filter = {};
 
     if (search) {
+        const sanitizedSearch = search.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         filter.$or = [
-            { username: { $regex: search, $options: "i" } },
-            { email: { $regex: search, $options: "i" } }
+            { username: { $regex: sanitizedSearch, $options: "i" } },
+            { email: { $regex: sanitizedSearch, $options: "i" } }
         ];
     }
     if (role) filter.role = role;
