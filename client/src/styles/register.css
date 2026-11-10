@@ -16,8 +16,8 @@
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(900px 420px at 10% -10%, rgba(0, 255, 163, 0.15), transparent 55%),
-              radial-gradient(900px 420px at 110% 0%, rgba(138, 43, 226, 0.15), transparent 55%);
+  background: radial-gradient(900px 420px at 10% -10%, rgba(0, 212, 255, 0.15), transparent 55%),
+              radial-gradient(900px 420px at 110% 0%, rgba(118, 87, 255, 0.15), transparent 55%);
   opacity: 0.8;
   z-index: 1;
 }
@@ -120,15 +120,15 @@
 
 .hub-navbar button:hover {
   border-color: var(--neon-cyan);
-  background: rgba(0, 255, 163, 0.1);
+  background: rgba(0, 212, 255, 0.1);
   color: var(--neon-cyan);
-  text-shadow: 0 0 10px rgba(0, 255, 163, 0.6);
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
   transform: translateY(-2px);
 }
 
 .hub-navbar button.active {
   border-color: var(--neon-cyan);
-  background: rgba(0, 255, 163, 0.15);
+  background: rgba(0, 212, 255, 0.15);
   color: var(--neon-cyan);
   text-shadow: var(--glow-cyan);
 }
@@ -211,15 +211,15 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(0, 255, 163, 0.1), transparent 50%),
-              radial-gradient(circle at 100% 100%, rgba(138, 43, 226, 0.1), transparent 50%);
+  background: radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.1), transparent 50%),
+              radial-gradient(circle at 100% 100%, rgba(118, 87, 255, 0.1), transparent 50%);
   pointer-events: none;
   opacity: 0.6;
 }
 
 .registration-hub form:hover {
   transform: translateY(-8px);
-  box-shadow: 0 30px 60px rgba(0, 255, 163, 0.2);
+  box-shadow: 0 30px 60px rgba(0, 212, 255, 0.2);
   border-color: var(--neon-cyan);
 }
 
@@ -265,10 +265,10 @@
 .registration-hub form input:focus {
   outline: none;
   border-color: var(--neon-cyan);
-  background: rgba(0, 255, 163, 0.08);
-  box-shadow: 0 0 0 3px rgba(0, 255, 163, 0.2),
-              0 0 20px rgba(0, 255, 163, 0.3),
-              inset 0 0 20px rgba(0, 255, 163, 0.05);
+  background: rgba(0, 212, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2),
+              0 0 20px rgba(0, 212, 255, 0.3),
+              inset 0 0 20px rgba(0, 212, 255, 0.05);
   transform: translateY(-2px);
 }
 
@@ -293,7 +293,7 @@
   position: relative;
   overflow: hidden;
   margin-top: clamp(1rem, 3vw, 1.5rem);
-  box-shadow: 0 8px 24px rgba(0, 255, 163, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
@@ -310,7 +310,7 @@
 
 .registration-hub form button:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 32px rgba(0, 255, 163, 0.4);
+  box-shadow: 0 12px 32px rgba(0, 212, 255, 0.4);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
@@ -326,7 +326,7 @@
   opacity: 0.6;
   cursor: not-allowed;
   transform: none !important;
-  box-shadow: 0 4px 12px rgba(0, 255, 163, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
 }
 
 /* ---------- OPTIONS GRID ---------- */
@@ -374,8 +374,8 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(0, 255, 163, 0.1), transparent 50%),
-              radial-gradient(circle at 100% 100%, rgba(138, 43, 226, 0.1), transparent 50%);
+  background: radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.1), transparent 50%),
+              radial-gradient(circle at 100% 100%, rgba(118, 87, 255, 0.1), transparent 50%);
   pointer-events: none;
   opacity: 0.6;
 }
@@ -383,7 +383,7 @@
 .option-card:hover {
   transform: translateY(-12px) scale(1.02);
   border-color: var(--neon-cyan);
-  box-shadow: 0 20px 40px rgba(0, 255, 163, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 212, 255, 0.3);
 }
 
 .option-card:hover::before {
@@ -392,7 +392,7 @@
 
 .option-card.active {
   border: 2px solid var(--neon-cyan);
-  background: rgba(0, 255, 163, 0.1);
+  background: rgba(0, 212, 255, 0.1);
   box-shadow: var(--glow-cyan);
 }
 
@@ -444,7 +444,7 @@
 
 .card-cta:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 24px rgba(0, 255, 163, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 212, 255, 0.4);
 }
 
 /* ---------- RESPONSIVE DESIGN ---------- */
@@ -494,4 +494,21 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+
+/* ---------- FORM GROUP HELPERS ---------- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: clamp(1rem, 2.5vw, 1.25rem);
+}
+
+.form-group label {
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }

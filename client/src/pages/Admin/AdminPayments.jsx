@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { getAllPayments, getPaymentStats, refundPayment } from "../../api/apiRoutes";
 import { useAuth } from "../../hooks/useAuth";
 import ConfirmModal from "../../components/ConfirmModal";
+import AdminNav from "../../components/AdminNav";
+import { formatINR, formatDateTimeIST } from "../../utils/formatters";
 import "../../styles/theme.css";
 import "../../styles/adminPayments.css";
 
@@ -100,14 +102,11 @@ const AdminPayments = () => {
 
     return (
         <div className="admin-page">
-            <header className="admin-header">
-                <div className="header-content">
-                    <div>
-                        <h1>💰 Payment Management</h1>
-                        <p className="subtitle">View and manage tournament payments</p>
-                    </div>
-                </div>
-            </header>
+            <div className="container">
+                <AdminNav
+                    title="Financials & Payment Auditing"
+                    subtitle="Audit tournament entry fees, verify payment states, and process athlete refunds."
+                />
 
             <main className="admin-main">
                 {error && <div className="alert alert-error">{error}</div>}
@@ -119,7 +118,7 @@ const AdminPayments = () => {
                         <div className="stat-card">
                             <div className="stat-icon">💰</div>
                             <div className="stat-info">
-                                <div className="stat-value">${stats.totalRevenue || 0}</div>
+                                <div className="stat-value">{formatINR(stats.totalRevenue || 0)}</div>
                                 <div className="stat-label">Total Revenue</div>
                             </div>
                         </div>
@@ -127,7 +126,7 @@ const AdminPayments = () => {
                             <div key={s._id} className="stat-card">
                                 <div className="stat-icon">{getStatusIcon(s._id)}</div>
                                 <div className="stat-info">
-                                    <div className="stat-value">${s.totalAmount}</div>
+                                    <div className="stat-value">{formatINR(s.totalAmount)}</div>
                                     <div className="stat-label">{s._id.charAt(0).toUpperCase() + s._id.slice(1)} ({s.count})</div>
                                 </div>
                             </div>
@@ -208,7 +207,7 @@ const AdminPayments = () => {
                                             <th>User</th>
                                             <th>Team</th>
                                             <th>Tournament</th>
-                                            <th>Amount</th>
+                                            <th>Amount (₹ INR)</th>
                                             <th>Status</th>
                                             <th>Method</th>
                                             <th>Date</th>
@@ -234,14 +233,14 @@ const AdminPayments = () => {
                                                         <span className="tournament-game">{payment.tournamentId?.game}</span>
                                                     </div>
                                                 </td>
-                                                <td className="amount-cell">${payment.amount}</td>
+                                                <td className="amount-cell">{formatINR(payment.amount)}</td>
                                                 <td>
                                                     <span className={`payment-status ${payment.status}`}>
                                                         {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
                                                     </span>
                                                 </td>
                                                 <td>{payment.paymentMethod?.toUpperCase() || "Test"}</td>
-                                                <td>{payment.createdAt ? new Date(payment.createdAt).toLocaleString() : "N/A"}</td>
+                                                <td>{payment.createdAt ? formatDateTimeIST(payment.createdAt) : "N/A"}</td>
                                                 <td>
                                                     <div className="action-buttons">
                                                         {payment.status === "paid" && (
@@ -298,6 +297,7 @@ const AdminPayments = () => {
                     onReasonChange={(reason) => setRefundModal(prev => ({ ...prev, reason }))}
                 />
             </main>
+            </div>
         </div>
     );
 };

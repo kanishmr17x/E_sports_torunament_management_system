@@ -1,310 +1,465 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { getTournaments, createTournament, deleteTournament } from "../../api/apiRoutes";
+import ConfirmModal from "../../components/ConfirmModal";
+import AdminNav from "../../components/AdminNav";
+import { formatINR, formatDateIST } from "../../utils/formatters";
 import "../../styles/theme.css";
+import "../../styles/adminTournaments.css";
 
 const AdminTournaments = () => {
+  const { isAdmin, isOrganizer, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [tournaments, setTournaments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null, name: "" });
+
   const [formData, setFormData] = useState({
-    tournamentName: "",
-    gameTitle: "",
+    name: "",
+    game: "BGMI",
+    type: "team",
+    format: "single_elimination",
     startDate: "",
     endDate: "",
-    format: "League",
-    status: "Upcoming"
+    maxTeams: 16,
+    prizePool: "",
+    entryFee: 0,
+    description: "",
+    rules: ""
   });
-  const [errors, setErrors] = useState({});
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.tournamentName.trim()) newErrors.tournamentName = "Tournament name is required";
-    if (!formData.gameTitle.trim()) newErrors.gameTitle = "Game title is required";
-    if (!formData.startDate) newErrors.startDate = "Start date is required";
-    if (!formData.endDate) newErrors.endDate = "End date is required";
-    if (new Date(formData.endDate) < new Date(formData.startDate)) {
-      newErrors.endDate = "End date must be after start date";
+  const [formErrors, setFormErrors] = useState({});
+
+  useEffect(() => {
+    if (!authLoading && !isAdmin && !isOrganizer) {
+      navigate("/unauthorized");
     }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  }, [isAdmin, isOrganizer, authLoading, navigate]);
+
+  const loadTournaments = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const data = await getTournaments();
+      setTournaments(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setError(err.message || "Failed to load tournaments");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      const newTournament = {
-        id: Date.now(),
-        ...formData,
-        startDate: new Date(formData.startDate).toLocaleDateString(),
-        endDate: new Date(formData.endDate).toLocaleDateString()
-      };
-      setTournaments([...tournaments, newTournament]);
-      setFormData({
-        tournamentName: "",
-        gameTitle: "",
-        startDate: "",
-        endDate: "",
-        format: "League",
-        status: "Upcoming"
-      });
-      setErrors({});
+  useEffect(() => {
+    loadTournaments();
+  }, []);
+
+  const validateForm = () => {
+    const errs = {};
+    if (!formData.name.trim()) errs.name = "Tournament name is required";
+    if (!formData.game.trim()) errs.game = "Game title is required";
+    if (!formData.startDate) errs.startDate = "Start date & time are required";
+    if (!formData.endDate) errs.endDate = "End date & time are required";
+    if (formData.startDate && formData.endDate && new Date(formData.endDate) <= new Date(formData.startDate)) {
+      errs.endDate = "End date must be after start date";
     }
+    if (!formData.maxTeams || Number(formData.maxTeams) < 2) {
+      errs.maxTeams = "Max teams must be at least 2";
+    }
+    setFormErrors(errs);
+    return Object.keys(errs).length === 0;
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: "" }));
     }
   };
 
-  const handleDelete = (id) => {
-    setTournaments(tournaments.filter(t => t.id !== id));
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    try {
+      setActionLoading(true);
+      setError("");
+      setSuccess("");
+
+      const payload = {
+        name: formData.name.trim(),
+        game: formData.game.trim(),
+        type: formData.type,
+        format: formData.format,
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
+        maxTeams: Number(formData.maxTeams),
+        prizePool: formData.prizePool ? String(formData.prizePool) : "TBD",
+        entryFee: Number(formData.entryFee) || 0,
+        description: formData.description.trim(),
+        rules: formData.rules.trim()
+      };
+
+      await createTournament(payload);
+      setSuccess("Tournament deployed successfully!");
+      setShowCreateForm(false);
+      setFormData({
+        name: "",
+        game: "BGMI",
+        type: "team",
+        format: "single_elimination",
+        startDate: "",
+        endDate: "",
+        maxTeams: 16,
+        prizePool: "",
+        entryFee: 0,
+        description: "",
+        rules: ""
+      });
+      loadTournaments();
+      setTimeout(() => setSuccess(""), 4000);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || "Failed to create tournament");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteModal.id) return;
+    try {
+      setActionLoading(true);
+      await deleteTournament(deleteModal.id);
+      setTournaments(prev => prev.filter(t => t._id !== deleteModal.id));
+      setDeleteModal({ isOpen: false, id: null, name: "" });
+      setSuccess("Tournament removed successfully.");
+      setTimeout(() => setSuccess(""), 4000);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || "Failed to delete tournament");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)',
-      padding: '80px 20px 40px'
-    }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{
-          textAlign: 'center',
-          marginBottom: '40px'
-        }}>
-          <h1 style={{
-            fontSize: '2.5rem',
-            fontWeight: '800',
-            color: '#fff',
-            marginBottom: '16px',
-            textShadow: '0 0 20px rgba(255, 215, 0, 0.5)'
-          }}>🏆 Manage Tournaments</h1>
-          <p style={{ color: '#9aa0aa', fontSize: '1.1rem' }}>
-            Create and manage esports tournaments
-          </p>
-        </div>
+    <div className="admin-tournaments-page">
+      <div className="container">
+        {/* Universal Admin Navigation */}
+        <AdminNav
+          title="Tournament Operations"
+          subtitle="Deploy, configure, seed, and manage competitive esports tournament brackets."
+          actions={
+            <button 
+              onClick={() => setShowCreateForm(!showCreateForm)}
+              className={`btn ${showCreateForm ? "btn-outline" : "btn-primary"} btn-sm`}
+            >
+              {showCreateForm ? "✕ Close Form" : "+ Create Tournament"}
+            </button>
+          }
+        />
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 2fr',
-          gap: '30px',
-          marginBottom: '40px'
-        }}>
-          <div className="card">
-            <h2 style={{ color: '#FFD700', marginBottom: '24px' }}>Create Tournament</h2>
-            <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ color: '#fff', display: 'block', marginBottom: '8px' }}>
-                  Tournament Name *
-                </label>
-                <input
-                  type="text"
-                  name="tournamentName"
-                  value={formData.tournamentName}
-                  onChange={handleInputChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: errors.tournamentName ? '1px solid #ff6b6b' : '1px solid rgba(255, 255, 255, 0.2)',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: '#fff'
-                  }}
-                />
-                {errors.tournamentName && (
-                  <p style={{ color: '#ff6b6b', fontSize: '0.8rem', marginTop: '4px' }}>
-                    {errors.tournamentName}
-                  </p>
-                )}
+        {/* Alerts */}
+        {error && (
+          <div className="alert alert-danger" style={{ marginBottom: "1.5rem" }}>
+            ⚠️ {error}
+          </div>
+        )}
+        {success && (
+          <div className="alert alert-success" style={{ marginBottom: "1.5rem" }}>
+            ✅ {success}
+          </div>
+        )}
+
+        {/* Create Tournament Form Drawer */}
+        {showCreateForm && (
+          <div className="admin-form-card">
+            <div className="admin-form-header">
+              <div>
+                <h2 className="admin-section-heading" style={{ margin: 0 }}>
+                  ⚡ Configure New Tournament Battleground
+                </h2>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0.25rem 0 0" }}>
+                  Specify format, titles, prize pool, and bracket capacity.
+                </p>
+              </div>
+              <span style={{ fontSize: "0.8rem", color: "var(--accent-secondary)" }}>
+                * Mandatory fields
+              </span>
+            </div>
+
+            <form onSubmit={handleCreateSubmit}>
+              <div className="form-grid-2">
+                <div className="form-group">
+                  <label className="form-label">Tournament Name *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="e.g. Apex Predators Championship 2026"
+                    className={`form-input ${formErrors.name ? "input-error" : ""}`}
+                  />
+                  {formErrors.name && <span className="field-error">{formErrors.name}</span>}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Game Title *</label>
+                  <select
+                    name="game"
+                    value={formData.game}
+                    onChange={handleInputChange}
+                    className="form-input"
+                  >
+                    <option value="BGMI">BGMI (Battlegrounds Mobile India)</option>
+                    <option value="Valorant">Valorant</option>
+                    <option value="Free Fire">Free Fire MAX</option>
+                    <option value="CS2">Counter-Strike 2</option>
+                    <option value="Call of Duty: Mobile">Call of Duty: Mobile</option>
+                    <option value="League of Legends">League of Legends</option>
+                    <option value="Dota 2">Dota 2</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Tournament Type</label>
+                  <select
+                    name="type"
+                    value={formData.type}
+                    onChange={handleInputChange}
+                    className="form-input"
+                  >
+                    <option value="team">Team (Squad)</option>
+                    <option value="solo">Solo (1v1)</option>
+                    <option value="duo">Duo (2v2)</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Bracket Format</label>
+                  <select
+                    name="format"
+                    value={formData.format}
+                    onChange={handleInputChange}
+                    className="form-input"
+                  >
+                    <option value="single_elimination">Single Elimination</option>
+                    <option value="double_elimination">Double Elimination</option>
+                    <option value="round_robin">Round Robin</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Start Date & Time *</label>
+                  <input
+                    type="datetime-local"
+                    name="startDate"
+                    value={formData.startDate}
+                    onChange={handleInputChange}
+                    className={`form-input ${formErrors.startDate ? "input-error" : ""}`}
+                  />
+                  {formErrors.startDate && <span className="field-error">{formErrors.startDate}</span>}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">End Date & Time *</label>
+                  <input
+                    type="datetime-local"
+                    name="endDate"
+                    value={formData.endDate}
+                    onChange={handleInputChange}
+                    className={`form-input ${formErrors.endDate ? "input-error" : ""}`}
+                  />
+                  {formErrors.endDate && <span className="field-error">{formErrors.endDate}</span>}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Max Squad Capacity *</label>
+                  <input
+                    type="number"
+                    name="maxTeams"
+                    min="2"
+                    max="128"
+                    value={formData.maxTeams}
+                    onChange={handleInputChange}
+                    className={`form-input ${formErrors.maxTeams ? "input-error" : ""}`}
+                  />
+                  {formErrors.maxTeams && <span className="field-error">{formErrors.maxTeams}</span>}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Prize Bounty</label>
+                  <input
+                    type="text"
+                    name="prizePool"
+                    placeholder="e.g. 500000 for ₹5,00,000 or Trophy"
+                    value={formData.prizePool}
+                    onChange={handleInputChange}
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Entry Fee (₹ INR)</label>
+                  <input
+                    type="number"
+                    name="entryFee"
+                    min="0"
+                    step="0.01"
+                    placeholder="0 for Free Entry"
+                    value={formData.entryFee}
+                    onChange={handleInputChange}
+                    className="form-input"
+                  />
+                </div>
               </div>
 
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ color: '#fff', display: 'block', marginBottom: '8px' }}>
-                  Game Title *
-                </label>
-                <input
-                  type="text"
-                  name="gameTitle"
-                  value={formData.gameTitle}
+              <div className="form-group" style={{ marginBottom: "1.25rem" }}>
+                <label className="form-label">Description & Circuit Protocol</label>
+                <textarea
+                  name="description"
+                  rows="3"
+                  placeholder="Format guidelines, stream links, check-in requirements..."
+                  value={formData.description}
                   onChange={handleInputChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: errors.gameTitle ? '1px solid #ff6b6b' : '1px solid rgba(255, 255, 255, 0.2)',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: '#fff'
-                  }}
+                  className="form-textarea"
                 />
-                {errors.gameTitle && (
-                  <p style={{ color: '#ff6b6b', fontSize: '0.8rem', marginTop: '4px' }}>
-                    {errors.gameTitle}
-                  </p>
-                )}
               </div>
 
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ color: '#fff', display: 'block', marginBottom: '8px' }}>
-                  Start Date *
-                </label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleInputChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: errors.startDate ? '1px solid #ff6b6b' : '1px solid rgba(255, 255, 255, 0.2)',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: '#fff'
-                  }}
-                />
-                {errors.startDate && (
-                  <p style={{ color: '#ff6b6b', fontSize: '0.8rem', marginTop: '4px' }}>
-                    {errors.startDate}
-                  </p>
-                )}
-              </div>
-
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ color: '#fff', display: 'block', marginBottom: '8px' }}>
-                  End Date *
-                </label>
-                <input
-                  type="date"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleInputChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: errors.endDate ? '1px solid #ff6b6b' : '1px solid rgba(255, 255, 255, 0.2)',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: '#fff'
-                  }}
-                />
-                {errors.endDate && (
-                  <p style={{ color: '#ff6b6b', fontSize: '0.8rem', marginTop: '4px' }}>
-                    {errors.endDate}
-                  </p>
-                )}
-              </div>
-
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ color: '#fff', display: 'block', marginBottom: '8px' }}>
-                  Format
-                </label>
-                <select
-                  name="format"
-                  value={formData.format}
-                  onChange={handleInputChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: '#fff'
-                  }}
+              <div className="form-actions-bar">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateForm(false)}
+                  className="btn btn-outline"
+                  disabled={actionLoading}
                 >
-                  <option value="League">League</option>
-                  <option value="Knockout">Knockout</option>
-                  <option value="Hybrid">Hybrid</option>
-                </select>
-              </div>
-
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{ color: '#fff', display: 'block', marginBottom: '8px' }}>
-                  Status
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    color: '#fff'
-                  }}
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={actionLoading}
                 >
-                  <option value="Upcoming">Upcoming</option>
-                  <option value="Ongoing">Ongoing</option>
-                  <option value="Completed">Completed</option>
-                </select>
+                  {actionLoading ? "Deploying..." : "⚡ Deploy Tournament"}
+                </button>
               </div>
-
-              <button
-                type="submit"
-                className="btn btn-primary"
-                style={{ width: '100%' }}
-              >
-                Create Tournament
-              </button>
             </form>
           </div>
+        )}
 
-          <div className="card">
-            <h2 style={{ color: '#FFD700', marginBottom: '24px' }}>Tournament List</h2>
-            {tournaments.length === 0 ? (
-              <p style={{ color: '#9aa0aa', textAlign: 'center', padding: '40px' }}>
-                No tournaments created yet. Create your first tournament!
-              </p>
-            ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}>
-                      <th style={{ padding: '12px', textAlign: 'left', color: '#fff' }}>Name</th>
-                      <th style={{ padding: '12px', textAlign: 'left', color: '#fff' }}>Game</th>
-                      <th style={{ padding: '12px', textAlign: 'left', color: '#fff' }}>Start Date</th>
-                      <th style={{ padding: '12px', textAlign: 'left', color: '#fff' }}>End Date</th>
-                      <th style={{ padding: '12px', textAlign: 'left', color: '#fff' }}>Format</th>
-                      <th style={{ padding: '12px', textAlign: 'left', color: '#fff' }}>Status</th>
-                      <th style={{ padding: '12px', textAlign: 'left', color: '#fff' }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tournaments.map((tournament) => (
-                      <tr key={tournament.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                        <td style={{ padding: '12px', color: '#fff' }}>{tournament.tournamentName}</td>
-                        <td style={{ padding: '12px', color: '#fff' }}>{tournament.gameTitle}</td>
-                        <td style={{ padding: '12px', color: '#fff' }}>{tournament.startDate}</td>
-                        <td style={{ padding: '12px', color: '#fff' }}>{tournament.endDate}</td>
-                        <td style={{ padding: '12px', color: '#fff' }}>
-                          <span className="badge">{tournament.format}</span>
-                        </td>
-                        <td style={{ padding: '12px', color: '#fff' }}>
-                          <span className={`badge ${tournament.status}`}>{tournament.status}</span>
-                        </td>
-                        <td style={{ padding: '12px' }}>
+        {/* Tournaments Data Table */}
+        <div className="admin-table-container">
+          <div className="admin-table-header-row">
+            <div>
+              <h3 className="admin-table-title">Deployed Tournaments ({tournaments.length})</h3>
+              <p className="admin-table-sub">Live competitive fixtures and registered brackets.</p>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="empty-table-state">
+              <div className="admin-spinner" style={{ margin: "0 auto 1rem" }}></div>
+              <p>Loading tournaments directory...</p>
+            </div>
+          ) : tournaments.length === 0 ? (
+            <div className="empty-table-state">
+              <div className="empty-table-icon">🏆</div>
+              <h3>No Tournaments Found</h3>
+              <p>Get started by deploying your first tournament battleground above.</p>
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table className="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Tournament</th>
+                    <th>Game & Mode</th>
+                    <th>Bracket Format</th>
+                    <th>Schedule</th>
+                    <th>Squad Slots</th>
+                    <th>Status</th>
+                    <th>Controls</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tournaments.map(t => (
+                    <tr key={t._id}>
+                      <td>
+                        <div style={{ fontWeight: 800, color: "var(--text-primary)" }}>{t.name}</div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--accent-secondary)" }}>
+                          Bounty: {formatINR(t.prizePool, { fallback: "Free / Glory" })}
+                        </div>
+                      </td>
+                      <td>
+                        <span style={{ fontWeight: 700 }}>{t.game}</span>
+                        <span style={{ display: "block", fontSize: "0.72rem", color: "var(--text-secondary)" }}>
+                          {t.type?.toUpperCase()}
+                        </span>
+                      </td>
+                      <td>
+                        <span style={{ fontSize: "0.85rem", textTransform: "capitalize" }}>
+                          {t.format?.replace(/_/g, " ") || "Single Elim"}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ fontSize: "0.8rem" }}>
+                          {formatDateIST(t.startDate)}
+                        </div>
+                        <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+                          to {formatDateIST(t.endDate)}
+                        </div>
+                      </td>
+                      <td>
+                        <span style={{ fontWeight: 800, color: "var(--text-primary)" }}>
+                          {t.teams?.length || 0} / {t.maxTeams || "16"}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`table-badge ${t.status || "upcoming"}`}>
+                          {t.status?.replace(/_/g, " ") || "Upcoming"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="table-actions">
+                          <Link to={`/tournaments/${t._id}`} className="btn btn-outline btn-xs" title="View Dossier">
+                            Dossier
+                          </Link>
+                          <Link to={`/bracket?tournament=${t._id}`} className="btn btn-outline btn-xs" title="Bracket">
+                            Bracket
+                          </Link>
                           <button
-                            className="btn btn-outline"
-                            style={{ marginRight: '8px', padding: '4px 8px', fontSize: '0.8rem' }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="btn btn-outline"
-                            onClick={() => handleDelete(tournament.id)}
-                            style={{ padding: '4px 8px', fontSize: '0.8rem', background: 'rgba(255, 107, 107, 0.2)', borderColor: '#ff6b6b', color: '#ff6b6b' }}
+                            onClick={() => setDeleteModal({ isOpen: true, id: t._id, name: t.name })}
+                            className="btn btn-outline btn-xs"
+                            style={{ borderColor: "rgba(255, 59, 59, 0.4)", color: "#FF6B6B" }}
+                            title="Delete Tournament"
                           >
                             Delete
                           </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Confirm Deletion Modal */}
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        title="Delete Tournament"
+        message={`Are you sure you want to permanently delete "${deleteModal.name}"? This will cancel existing registrations.`}
+        confirmText={actionLoading ? "Deleting..." : "Delete"}
+        cancelText="Cancel"
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteModal({ isOpen: false, id: null, name: "" })}
+      />
     </div>
   );
 };

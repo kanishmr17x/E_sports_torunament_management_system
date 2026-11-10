@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { getUpcomingMatches, getCompletedMatches } from "../../api/apiRoutes";
-import { useAuth } from "../../hooks/useAuth";
+import MatchCard from "../../components/MatchCard";
+import Breadcrumbs from "../../components/Breadcrumbs";
 import "../../styles/theme.css";
 import "../../styles/matches.css";
 
 const Matches = () => {
-    const navigate = useNavigate();
-    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState("upcoming");
     const [upcomingMatches, setUpcomingMatches] = useState([]);
     const [completedMatches, setCompletedMatches] = useState([]);
@@ -20,10 +18,6 @@ const Matches = () => {
     }, []);
 
     const loadMatches = async () => {
-        if (!user) {
-            navigate("/login");
-            return;
-        }
         try {
             setLoading(true);
             const [upcomingRes, completedRes] = await Promise.all([
@@ -67,6 +61,7 @@ const Matches = () => {
 
     return (
         <div className="matches-page">
+            <div className="container" style={{ paddingTop: "1rem" }}><Breadcrumbs items={[{ label: "Matches & Fixtures" }]} /></div>
             <header className="matches-header">
                 <div className="header-content">
                     <div>
@@ -105,7 +100,7 @@ const Matches = () => {
                 </button>
             </div>
 
-            <main className="matches-main">
+                        <main className="matches-main">
                 {error && <div className="alert alert-error">{error}</div>}
 
                 {activeTab === "upcoming" ? (
@@ -118,37 +113,7 @@ const Matches = () => {
                             </div>
                         ) : (
                             filteredUpcoming.map(match => (
-                                <div key={match._id} className="match-card upcoming">
-                                    <div className="match-card-header">
-                                        <div className="match-tournament">
-                                            <span className="tournament-name">{match.tournamentId?.name || "Tournament"}</span>
-                                            <span className="tournament-game">{match.tournamentId?.game}</span>
-                                        </div>
-                                        <span className={`status-badge ${match.status}`}>{match.status}</span>
-                                    </div>
-                                    <div className="match-teams">
-                                        <div className="team">
-                                            <span className="team-name">{match.team1?.teamName || "TBD"}</span>
-                                            <span className="team-game">{match.team1?.game}</span>
-                                        </div>
-                                        <div className="vs">vs</div>
-                                        <div className="team">
-                                            <span className="team-name">{match.team2?.teamName || "TBD"}</span>
-                                            <span className="team-game">{match.team2?.game}</span>
-                                        </div>
-                                    </div>
-                                    <div className="match-meta">
-                                        <span>📅 {match.scheduledAt ? new Date(match.scheduledAt).toLocaleString() : "TBD"}</span>
-                                        <span>🏆 Round {match.round}, Match {match.matchNumber}</span>
-                                        {match.venue && <span>📍 {match.venue}</span>}
-                                        {match.serverInfo && <span>🖥️ {match.serverInfo}</span>}
-                                    </div>
-                                    <div className="match-actions">
-                                        {match.status === "live" && (
-                                            <button className="btn btn-primary btn-sm">Watch Live</button>
-                                        )}
-                                    </div>
-                                </div>
+                                <MatchCard key={match._id} match={match} variant="standard" />
                             ))
                         )}
                     </div>
@@ -162,38 +127,7 @@ const Matches = () => {
                             </div>
                         ) : (
                             filteredCompleted.map(match => (
-                                <div key={match._id} className="match-card completed">
-                                    <div className="match-card-header">
-                                        <div className="match-tournament">
-                                            <span className="tournament-name">{match.tournamentId?.name || "Tournament"}</span>
-                                            <span className="tournament-game">{match.tournamentId?.game}</span>
-                                        </div>
-                                        <span className="status-badge completed">Completed</span>
-                                    </div>
-                                    <div className="match-result">
-                                        <div className="team">
-                                            <span className="team-name">{match.team1?.teamName || "TBD"}</span>
-                                        </div>
-                                        <div className="score">
-                                            <span className="team1-score">{match.team1Score}</span>
-                                            <span className="separator">-</span>
-                                            <span className="team2-score">{match.team2Score}</span>
-                                        </div>
-                                        <div className="team">
-                                            <span className="team-name">{match.team2?.teamName || "TBD"}</span>
-                                        </div>
-                                    </div>
-                                    <div className="match-meta">
-                                        <span>🏆 Winner: {match.winner?.teamName || "Draw"}</span>
-                                        <span>📅 {match.scheduledAt ? new Date(match.scheduledAt).toLocaleDateString() : "TBD"}</span>
-                                        <span>🏆 Round {match.round}, Match {match.matchNumber}</span>
-                                    </div>
-                                    {match.notes && (
-                                        <div className="match-notes">
-                                            <strong>Notes:</strong> {match.notes}
-                                        </div>
-                                    )}
-                                </div>
+                                <MatchCard key={match._id} match={match} variant="standard" />
                             ))
                         )}
                     </div>

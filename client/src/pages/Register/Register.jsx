@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import { formatINR, formatDateIST } from "../../utils/formatters";
 import { getTournaments, getTeams, createTeam, addPlayer } from "../../api/apiRoutes";
 import "../../styles/theme.css";
 import "../../styles/tournament.css";
@@ -253,12 +255,12 @@ const Register = () => {
                       <div className="tournament-info-item">
                         <span className="tournament-info-label">Start Date</span>
                         <span className="tournament-info-value">
-                          {new Date(tournament.startDate).toLocaleDateString()}
+                          {formatDateIST(tournament.startDate)}
                         </span>
                       </div>
                       <div className="tournament-info-item">
                         <span className="tournament-info-label">Prize Pool</span>
-                        <span className="tournament-info-value">${tournament.prizePool || 0}</span>
+                        <span className="tournament-info-value">{formatINR(tournament.prizePool || 0)}</span>
                       </div>
                     </div>
 
@@ -429,10 +431,12 @@ const Register = () => {
           <div className="form-section">
             <h3 className="form-section-title">🎉 Player Registration Successful!</h3>
             <div className="player-details-card" style={{
-              backgroundColor: "#1a1a1a",
-              border: "1px solid #333",
-              borderRadius: "8px",
-              padding: "20px",
+              background: "var(--glass-bg)",
+              border: "1px solid var(--glass-border)",
+              borderRadius: "var(--radius-xl)",
+              padding: "clamp(1.25rem, 3vw, 2rem)",
+              backdropFilter: "blur(16px)",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
               marginTop: "20px"
             }}>
               <div style={{ display: "grid", gap: "15px" }}>
@@ -442,33 +446,33 @@ const Register = () => {
                 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "15px" }}>
                   <div>
-                    <strong style={{ color: "#9aa0aa" }}>Name:</strong>
-                    <p style={{ margin: "5px 0", color: "#fff" }}>{registeredPlayer.playerName}</p>
+                    <strong style={{ color: "var(--text-muted)" }}>Name:</strong>
+                    <p style={{ margin: "5px 0", color: "var(--text-primary)" }}>{registeredPlayer.playerName}</p>
                   </div>
                   
                   <div>
-                    <strong style={{ color: "#9aa0aa" }}>Email:</strong>
-                    <p style={{ margin: "5px 0", color: "#fff" }}>{registeredPlayer.playerEmail}</p>
+                    <strong style={{ color: "var(--text-muted)" }}>Email:</strong>
+                    <p style={{ margin: "5px 0", color: "var(--text-primary)" }}>{registeredPlayer.playerEmail}</p>
                   </div>
                   
                   <div>
-                    <strong style={{ color: "#9aa0aa" }}>Age:</strong>
-                    <p style={{ margin: "5px 0", color: "#fff" }}>{registeredPlayer.age} years</p>
+                    <strong style={{ color: "var(--text-muted)" }}>Age:</strong>
+                    <p style={{ margin: "5px 0", color: "var(--text-primary)" }}>{registeredPlayer.age} years</p>
                   </div>
                   
                   <div>
-                    <strong style={{ color: "#9aa0aa" }}>Role:</strong>
-                    <p style={{ margin: "5px 0", color: "#fff" }}>{registeredPlayer.role}</p>
+                    <strong style={{ color: "var(--text-muted)" }}>Role:</strong>
+                    <p style={{ margin: "5px 0", color: "var(--text-primary)" }}>{registeredPlayer.role}</p>
                   </div>
                   
                   <div>
-                    <strong style={{ color: "#9aa0aa" }}>Game:</strong>
-                    <p style={{ margin: "5px 0", color: "#fff" }}>{registeredPlayer.gameId}</p>
+                    <strong style={{ color: "var(--text-muted)" }}>Game:</strong>
+                    <p style={{ margin: "5px 0", color: "var(--text-primary)" }}>{registeredPlayer.gameId}</p>
                   </div>
                   
                   <div>
-                    <strong style={{ color: "#9aa0aa" }}>Team:</strong>
-                    <p style={{ margin: "5px 0", color: "#fff" }}>{registeredPlayer.teamName}</p>
+                    <strong style={{ color: "var(--text-muted)" }}>Team:</strong>
+                    <p style={{ margin: "5px 0", color: "var(--text-primary)" }}>{registeredPlayer.teamName}</p>
                   </div>
                 </div>
                 

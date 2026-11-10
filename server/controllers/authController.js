@@ -75,21 +75,20 @@ exports.registerUser = asyncHandler(async (req, res) => {
     }, 201));
 });
 
-// Login User
+// Login User (supports emailOrUsername, email, or username)
 exports.loginUser = asyncHandler(async (req, res) => {
-    const { emailOrUsername, password } = req.body;
+    const identifier = (req.body.emailOrUsername || req.body.email || req.body.username || "").trim();
+    const { password } = req.body;
 
-    // Strict validation
-    const validation = validateRequired(['emailOrUsername', 'password'], req.body);
-    if (!validation.isValid) {
+    if (!identifier || !password) {
         return sendResponse(res, errorResponse("Email/Username and password required", 400));
     }
 
     // Find user by email or username
     const user = await User.findOne({
         $or: [
-            { email: emailOrUsername.toLowerCase().trim() },
-            { username: emailOrUsername.trim() }
+            { email: identifier.toLowerCase() },
+            { username: identifier }
         ]
     });
 

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('./models/User');
+const connectDB = require('./config/db');
 require('dotenv').config();
 
 const createAdmin = async () => {
@@ -9,23 +10,29 @@ const createAdmin = async () => {
       throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be configured');
     }
 
-    // Connect to MongoDB
-    if (!process.env.MONGO_URI) {
-      throw new Error('MONGO_URI must be configured');
+    if (process.env.NODE_ENV === 'production' && process.env.DB_NAME === 'esports_db') {
+      throw new Error("CRITICAL: Production cannot use development database 'esports_db'. Please specify DB_NAME=esports_db_prod.");
     }
-    await mongoose.connect(process.env.MONGO_URI, {
-      dbName: 'esportsdb'
-    });
-    console.log('Connected to MongoDB');
 
-    // Check if admin already exists
-    const existingAdmin = await User.findOne({ email: ADMIN_EMAIL.toLowerCase().trim() });
+    // Connect to MongoDB using centralized connection module
+    await connectDB();
+    console.log(`Connected to MongoDB [${mongoose.connection.name}]`);
+
+    // Check if admin already exists by email or username
+    const existingAdmin = await User.findOne({
+      $or: [
+        { email: ADMIN_EMAIL.toLowerCase().trim() },
+        { username: ADMIN_USERNAME.trim() }
+      ]
+    });
+
     if (existingAdmin) {
       console.log('Admin user already exists');
+      await mongoose.connection.close(false);
       process.exit(0);
     }
 
-    // Create admin user
+    // Create admin user (password is hashed automatically by pre-save hook)
     const admin = await User.create({
       username: ADMIN_USERNAME.trim(),
       email: ADMIN_EMAIL.toLowerCase().trim(),
@@ -33,11 +40,16 @@ const createAdmin = async () => {
       role: 'admin'
     });
 
-    console.log(`Admin user created successfully: ${admin.email}`);
-
+    console.log(`Admin user created successfully: ${admin.username}`);
+    await mongoose.connection.close(false);
     process.exit(0);
   } catch (error) {
-    console.error('Error creating admin:', error);
+    console.error('Error creating admin:', error.message);
+    try {
+      await mongoose.connection.close(false);
+    } catch (e) {
+      // ignore
+    }
     process.exit(1);
   }
 };

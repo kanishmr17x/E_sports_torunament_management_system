@@ -1,370 +1,434 @@
-/* Leaderboard Styles */
-.leaderboard-page {
-    min-height: 100vh;
-    background: var(--bg-primary);
+/* ==========================================================================
+   OBSIDIAN CYBER ARENA — LEADERBOARDS & PODIUM STANDINGS
+   ========================================================================== */
+
+.leaderboard-page-pro {
+  min-height: 100vh;
+  padding-bottom: 5rem;
 }
 
-.leaderboard-page.loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+/* ==========================================================================
+   1. LEADERBOARD HEADER
+   ========================================================================== */
+.leaderboard-header-pro {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 1.75rem 0 2rem;
+  margin-bottom: 2rem;
 }
 
-.spinner-container {
-    text-align: center;
-    padding: 3rem;
+.leaderboard-kicker {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--accent-secondary);
+  text-transform: uppercase;
 }
 
-.spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid rgba(255, 255, 255, 0.1);
-    border-top: 4px solid var(--neon-cyan);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
+.leaderboard-title-pro {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin-top: 0.25rem;
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
+.leaderboard-subtitle-pro {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-top: 0.35rem;
 }
 
-.leaderboard-header {
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--glass-border);
-    padding: 2rem 0;
-    position: sticky;
-    top: 0;
-    z-index: var(--z-sticky);
-    backdrop-filter: blur(12px);
+/* ==========================================================================
+   2. GRID LAYOUT (320px Sidebar / 1fr Content)
+   ========================================================================== */
+.leaderboard-grid-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2rem;
+  align-items: flex-start;
 }
 
-.header-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem;
+@media (max-width: 992px) {
+  .leaderboard-grid-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
-.leaderboard-header h1 {
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    font-weight: 800;
-    color: var(--text-primary);
+/* ==========================================================================
+   3. TOURNAMENTS SIDEBAR
+   ========================================================================== */
+.leaderboard-sidebar-pro {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-.subtitle {
-    color: var(--text-secondary);
-    font-size: var(--font-base);
+.sidebar-header-pro {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--glass-border-subtle);
+  padding-bottom: 0.75rem;
 }
 
-.leaderboard-main {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem;
+.sidebar-lbl {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
 }
 
-.alert {
-    padding: 1rem 1.5rem;
-    border-radius: var(--radius-md);
-    margin-bottom: 1.5rem;
-    font-weight: 600;
+.sidebar-header-pro h3 {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
 }
 
-.alert-error {
-    background: rgba(255, 59, 59, 0.15);
-    border: 1px solid rgba(255, 59, 59, 0.3);
-    color: var(--danger);
+.tournaments-selector-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.leaderboard-layout {
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 2rem;
+.tourney-select-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border-subtle);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  width: 100%;
 }
 
-.tournaments-sidebar {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-xl);
-    padding: 1.5rem;
-    height: fit-content;
-    position: sticky;
-    top: 100px;
+.tourney-select-btn:hover {
+  border-color: rgba(118, 87, 255, 0.35);
+  background: rgba(118, 87, 255, 0.08);
 }
 
-.sidebar-header {
-    margin-bottom: 1rem;
+.tourney-select-btn.active {
+  background: rgba(118, 87, 255, 0.16);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(118, 87, 255, 0.25);
 }
 
-.sidebar-header h2 {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--text-primary);
+.tourney-btn-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-.tournaments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+.tourney-btn-title {
+  font-family: var(--font-heading);
+  font-size: 0.925rem;
+  font-weight: 800;
+  color: var(--text-primary);
 }
 
-.tournament-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background: var(--bg-secondary);
-    border: 2px solid var(--glass-border);
-    border-radius: var(--radius-lg);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: left;
-    width: 100%;
+.tourney-btn-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.tournament-item:hover {
-    border-color: var(--neon-cyan);
+.tourney-btn-game {
+  font-size: 0.75rem;
+  color: var(--accent-secondary);
+  font-weight: 600;
 }
 
-.tournament-item.active {
-    border-color: var(--neon-cyan);
-    background: rgba(0, 255, 163, 0.05);
-    box-shadow: var(--glow-cyan);
+.status-badge-mini {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
-.tournament-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+.tourney-btn-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
-.tournament-name {
-    font-weight: 600;
-    color: var(--text-primary);
-    font-size: var(--font-base);
+/* ==========================================================================
+   4. MAIN STANDINGS PANEL & PODIUM SHOWCASE
+   ========================================================================== */
+.standings-card-pro {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
-.tournament-game {
-    font-size: var(--font-xs);
-    color: var(--neon-cyan);
-    text-transform: uppercase;
+.standings-card-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--glass-border-subtle);
+  padding-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.team-count {
-    font-size: var(--font-sm);
-    color: var(--text-muted);
-    background: var(--bg-tertiary);
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--radius-sm);
+.standings-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--accent-secondary);
 }
 
-.empty-state {
-    text-align: center;
-    padding: 2rem;
-    color: var(--text-secondary);
+.standings-tourney-name {
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 900;
+  color: var(--text-primary);
 }
 
-.leaderboard-content {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+.standings-count-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border-subtle);
+  color: var(--text-secondary);
 }
 
-.leaderboard-placeholder {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-xl);
-    color: var(--text-secondary);
+/* 3D Podium Showcase */
+.podium-showcase-pro {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--glass-border-subtle);
 }
 
-.empty-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
+.podium-pillar {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  transition: transform 0.25s ease;
 }
 
-.leaderboard-placeholder h2 {
-    color: var(--text-primary);
-    margin-bottom: 1rem;
+.podium-pillar.rank-1 {
+  background: linear-gradient(180deg, rgba(33, 30, 53, 0.95) 0%, rgba(23, 21, 38, 0.95) 100%);
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 8px 30px rgba(255, 215, 0, 0.15);
+  padding: 2.25rem 1rem 1.75rem;
 }
 
-.leaderboard-container {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-xl);
-    overflow: hidden;
+.podium-crown {
+  font-size: 1.6rem;
+  margin-bottom: -0.5rem;
 }
 
-.leaderboard-header {
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--glass-border);
-    padding: 1.5rem;
+.podium-avatar {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
 
-.leaderboard-header h2 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
+.podium-rank-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
 }
 
-.leaderboard-meta {
-    display: flex;
-    gap: 1.5rem;
-    font-size: var(--font-sm);
-    color: var(--text-secondary);
+.podium-rank-tag.gold {
+  color: var(--radiant-gold);
 }
 
-.leaderboard-table-wrapper {
-    overflow-x: auto;
+.podium-team-name {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0.25rem 0;
 }
 
-.leaderboard-table {
-    width: 100%;
-    border-collapse: collapse;
+.podium-team-name.gold {
+  color: #FFFFFF;
 }
 
-.leaderboard-table th,
-.leaderboard-table td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--glass-border);
+.podium-pts {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--accent-secondary);
 }
 
-.leaderboard-table th {
-    background: var(--bg-secondary);
-    font-weight: 700;
-    color: var(--neon-cyan);
-    font-size: var(--font-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.podium-pts.gold {
+  color: var(--radiant-gold);
+  font-size: 1.45rem;
 }
 
-.leaderboard-table td {
-    color: var(--text-primary);
+.podium-record {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
-.leaderboard-table tr:last-child td {
-    border-bottom: none;
+@media (max-width: 640px) {
+  .podium-showcase-pro {
+    grid-template-columns: 1fr;
+  }
 }
 
-.leaderboard-table tr.top-three {
-    background: rgba(255, 215, 0, 0.05);
+/* ==========================================================================
+   5. STANDINGS DATA TABLE
+   ========================================================================== */
+.standings-table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border-subtle);
 }
 
-.leaderboard-table tr.top-three:nth-child(1) td:first-child::before {
-    content: "🥇 ";
+.standings-table-pro {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
 }
 
-.leaderboard-table tr.top-three:nth-child(2) td:first-child::before {
-    content: "🥈 ";
+.standings-table-pro thead {
+  background: rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid var(--glass-border-subtle);
 }
 
-.leaderboard-table tr.top-three:nth-child(3) td:first-child::before {
-    content: "🥉 ";
+.standings-table-pro th {
+  padding: 0.85rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
 }
 
-.rank {
-    font-weight: 700;
-    font-size: 1.125rem;
-    min-width: 50px;
+.th-rank { width: 70px; }
+.th-stat { text-align: center; width: 65px; }
+.th-pts { width: 85px; color: var(--accent-secondary); }
+
+.standings-table-pro tbody tr {
+  border-bottom: 1px solid var(--glass-border-subtle);
+  transition: background 0.15s ease;
 }
 
-.team-cell {
-    min-width: 200px;
+.standings-table-pro tbody tr:hover {
+  background: rgba(118, 87, 255, 0.08);
 }
 
-.team-name {
-    font-weight: 600;
+.standings-row.row-champion {
+  background: rgba(255, 215, 0, 0.04);
 }
 
-.matches {
-    text-align: center;
+.standings-row.row-podium {
+  background: rgba(118, 87, 255, 0.04);
 }
 
-.wins {
-    color: var(--success);
-    font-weight: 600;
-    text-align: center;
+.standings-table-pro td {
+  padding: 1rem;
+  font-size: 0.9rem;
 }
 
-.losses {
-    color: var(--danger);
-    font-weight: 600;
-    text-align: center;
+.td-rank {
+  font-family: var(--font-heading);
+  font-weight: 800;
 }
 
-.draws {
-    text-align: center;
+.rank-medal {
+  font-size: 0.95rem;
+  font-weight: 900;
 }
 
-.points {
-    font-weight: 700;
-    color: var(--neon-cyan);
-    text-align: center;
+.rank-medal.gold { color: var(--radiant-gold); }
+.rank-medal.silver { color: #E0E0E0; }
+.rank-medal.bronze { color: #CD7F32; }
+
+.rank-num {
+  color: var(--text-muted);
 }
 
-.score-diff {
-    font-family: monospace;
-    font-weight: 600;
-    text-align: center;
+.team-cell-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.score-diff:not(:empty) {
-    color: var(--success);
+.team-cell-initial {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--accent-primary);
+  font-size: 0.85rem;
+  flex-shrink: 0;
 }
 
-.empty-leaderboard {
-    text-align: center;
-    padding: 3rem;
-    color: var(--text-secondary);
+.team-cell-name {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--text-primary);
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-    .leaderboard-layout {
-        grid-template-columns: 1fr;
-    }
-    
-    .tournaments-sidebar {
-        position: static;
-    }
-    
-    .tournaments-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 0.75rem;
-    }
+.td-stat {
+  text-align: center;
+  color: var(--text-secondary);
+  font-family: var(--font-heading);
+  font-weight: 700;
 }
 
-@media (max-width: 768px) {
-    .leaderboard-main {
-        padding: 1rem;
-    }
-    
-    .header-content {
-        padding: 0 1rem;
-    }
-    
-    .leaderboard-table {
-        font-size: var(--font-sm);
-    }
-    
-    .leaderboard-table th,
-    .leaderboard-table td {
-        padding: 0.75rem 0.5rem;
-    }
+.win-num { color: #10B981; }
+.loss-num { color: #FF3B3B; }
+
+.td-pts-val {
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: var(--accent-secondary);
 }
 
-@media (max-width: 480px) {
-    .leaderboard-table th:nth-child(4),
-    .leaderboard-table th:nth-child(5),
-    .leaderboard-table th:nth-child(6),
-    .leaderboard-table td:nth-child(4),
-    .leaderboard-table td:nth-child(5),
-    .leaderboard-table td:nth-child(6) {
-        display: none;
-    }
+.diff-pos { color: #10B981; font-weight: 800; }
+.diff-neg { color: #FF3B3B; font-weight: 800; }
+
+.empty-standings-box {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}
+
+.standings-placeholder-card {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-2xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }

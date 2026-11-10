@@ -147,9 +147,14 @@ exports.updateMatch = asyncHandler(async (req, res) => {
     if (round) updateData.round = parseInt(round);
     if (matchNumber) updateData.matchNumber = parseInt(matchNumber);
 
+    const currentMatch = await Match.findById(req.params.id);
+    if (!currentMatch) {
+        return sendResponse(res, errorResponse("Match not found", 404));
+    }
+
     if (round || matchNumber) {
         const existingMatch = await Match.findOne({
-            tournamentId: (await Match.findById(req.params.id)).tournamentId,
+            tournamentId: currentMatch.tournamentId,
             round: updateData.round || round,
             matchNumber: updateData.matchNumber || matchNumber,
             _id: { $ne: req.params.id }
@@ -202,14 +207,19 @@ exports.enterMatchResult = asyncHandler(async (req, res) => {
         result = "draw";
     }
 
+    const currentMatch = await Match.findById(req.params.id);
+    if (!currentMatch) {
+        return sendResponse(res, errorResponse("Match not found", 404));
+    }
+
     if (winner) {
         if (!validateObjectId(winner)) {
             return sendResponse(res, errorResponse("Invalid winner ID format", 400));
         }
         winnerId = winner;
     } else {
-        winnerId = result === "team1_win" ? (await Match.findById(req.params.id)).team1 :
-                   result === "team2_win" ? (await Match.findById(req.params.id)).team2 : null;
+        winnerId = result === "team1_win" ? currentMatch.team1 :
+                   result === "team2_win" ? currentMatch.team2 : null;
     }
 
     const match = await Match.findByIdAndUpdate(

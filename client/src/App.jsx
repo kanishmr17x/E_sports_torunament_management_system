@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import { Analytics } from "@vercel/analytics/react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -34,6 +35,8 @@ import Matches from "./pages/Matches/Matches";
 import Results from "./pages/Results/Results";
 import Leaderboard from "./pages/Leaderboard/Leaderboard";
 import Bracket from "./pages/Bracket/Bracket";
+import CustomCursor from "./components/CustomCursor";
+import "./styles/components.css";
 
 // Global error handler for uncaught promise rejections
 window.addEventListener('unhandledrejection', (event) => {
@@ -48,10 +51,13 @@ function App() {
         v7_relativeSplatPath: true 
       }}>
         <div className="page-root">
-          {/* Global page background video + overlay (fixed behind entire app) */}
-          <video className="app-bg-video" autoPlay muted loop playsInline aria-hidden="true">
-            <source src="/assets/videos/hero.mp4" type="video/mp4" />
-          </video>
+          <CustomCursor />
+          {/* Global animated cyber background */}
+          <div className="app-bg-cyber" aria-hidden="true">
+            <div className="cyber-glow cyber-glow-1"></div>
+            <div className="cyber-glow cyber-glow-2"></div>
+            <div className="cyber-grid-overlay"></div>
+          </div>
           <Navbar />
           <main className="page-main">
             <Routes>
@@ -62,6 +68,7 @@ function App() {
               <Route path="/tournaments/:id" element={<TournamentDetails />} />
               <Route path="/tournaments/:id/register" element={<TournamentRegistration />} />
               <Route path="/tournaments/:id/bracket" element={<Bracket />} />
+              <Route path="/bracket" element={<Bracket />} />
               <Route path="/teams" element={<TeamList />} />
               <Route path="/teams/:id" element={<TeamDetails />} />
               <Route path="/players" element={<PlayerList />} />
@@ -73,9 +80,9 @@ function App() {
               <Route path="/dashboard/teams" element={<ProtectedRoute><TeamManagement /></ProtectedRoute>} />
               <Route path="/dashboard/teams/:id/manage" element={<ProtectedRoute><TeamManagement /></ProtectedRoute>} />
               <Route path="/payment/:id" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-              <Route path="/matches" element={<ProtectedRoute><Matches /></ProtectedRoute>} />
-              <Route path="/results" element={<ProtectedRoute><Results /></ProtectedRoute>} />
-              <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+              <Route path="/matches" element={<Matches />} />
+              <Route path="/results" element={<Results />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/admin" element={
               <ProtectedRoute allowedRoles={["admin", "organizer"]}>
                 <AdminDashboard />
@@ -118,6 +125,8 @@ function App() {
           </main>
           <Footer />
         </div>
+        <SpeedInsights />
+        <Analytics />
         <SpeedInsights />
       </BrowserRouter>
     </AuthProvider>

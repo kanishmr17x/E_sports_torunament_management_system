@@ -85,7 +85,7 @@
 .result-form .form-group textarea:focus {
     outline: none;
     border-color: var(--neon-cyan);
-    box-shadow: 0 0 0 3px rgba(0, 255, 163, 0.2);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
 }
 
 .match-form .form-actions,

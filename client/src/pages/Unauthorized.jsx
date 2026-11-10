@@ -1,94 +1,132 @@
 import { Link } from "react-router-dom";
+import "../styles/theme.css";
 
 const Unauthorized = () => {
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '80px 20px'
-    }}>
-      <div style={{
-        textAlign: 'center',
-        maxWidth: '600px',
-        width: '100%'
-      }}>
-        <div style={{
-          fontSize: '5rem',
-          marginBottom: '32px',
-          display: 'block'
-        }}>
-          🔒
-        </div>
-        <h2 style={{
-          fontSize: '2rem',
-          fontWeight: '700',
-          color: '#fff',
-          marginBottom: '20px'
-        }}>
-          Admin Access Required
-        </h2>
-        <p style={{
-          fontSize: '1.1rem',
-          color: '#9aa0aa',
-          lineHeight: '1.6',
-          marginBottom: '40px'
-        }}>
-          This page is restricted to administrators only. If you believe this is an error, 
-          please contact the system administrator or log in with an admin account.
-        </p>
-        
-        <div style={{ 
-          display: 'flex', 
-          gap: '16px', 
-          justifyContent: 'center',
-          flexWrap: 'wrap'
-        }}>
-          <Link 
-            to="/" 
+    <div className="page-root">
+      <main
+        className="page-main"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "80vh",
+        }}
+      >
+        <div
+          style={{
+            textAlign: "center",
+            maxWidth: "560px",
+            width: "100%",
+            padding: "0 1rem",
+          }}
+        >
+          {/* Lock icon */}
+          <div
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '12px 24px',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              fontWeight: '700',
-              fontSize: '14px',
-              background: 'linear-gradient(135deg, #00a8ff, #0066cc)',
-              color: '#fff',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
+              width: "clamp(80px, 15vw, 120px)",
+              height: "clamp(80px, 15vw, 120px)",
+              margin: "0 auto clamp(1.5rem, 4vw, 2.5rem)",
+              borderRadius: "50%",
+              background: "rgba(255, 59, 59, 0.12)",
+              border: "2px solid rgba(255, 59, 59, 0.4)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "clamp(2.5rem, 6vw, 4rem)",
+              boxShadow: "0 0 40px rgba(255, 59, 59, 0.25)",
             }}
           >
-            🏠 Return Home
-          </Link>
-          <Link 
-            to="/login" 
+            🔒
+          </div>
+
+          {/* Error label */}
+          <p
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '12px 24px',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              fontWeight: '700',
-              fontSize: '14px',
-              background: 'transparent',
-              color: '#fff',
-              border: '2px solid #00a8ff',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
+              fontFamily: "var(--font-heading)",
+              fontSize: "clamp(0.7rem, 1.8vw, 0.875rem)",
+              fontWeight: 700,
+              color: "var(--danger)",
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              marginBottom: "clamp(0.5rem, 1.5vw, 0.75rem)",
             }}
           >
-            🔐 Login Again
-          </Link>
+            ERROR 403 — ACCESS DENIED
+          </p>
+
+          <h1
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "clamp(1.75rem, 5vw, 2.75rem)",
+              fontWeight: 900,
+              color: "var(--text-primary)",
+              lineHeight: 1.1,
+              marginBottom: "clamp(1rem, 3vw, 1.5rem)",
+            }}
+          >
+            Admin Access Required
+          </h1>
+
+          <p
+            style={{
+              fontSize: "clamp(0.9rem, 2.5vw, 1.1rem)",
+              color: "var(--text-secondary)",
+              lineHeight: 1.65,
+              marginBottom: "clamp(2rem, 5vw, 3rem)",
+            }}
+          >
+            This area is restricted to administrators only. If you believe this
+            is an error, please contact the system administrator or sign in with
+            an admin account.
+          </p>
+
+          {/* CTA row */}
+          <div
+            style={{
+              display: "flex",
+              gap: "clamp(0.75rem, 2vw, 1rem)",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <Link to="/" className="btn btn-primary">
+              🏠 Return Home
+            </Link>
+            <Link to="/login" className="btn btn-outline">
+              🔑 Login Again
+            </Link>
+          </div>
+
+          {/* Divider */}
+          <div
+            style={{
+              margin: "clamp(2rem, 5vw, 3rem) auto 0",
+              width: "100%",
+              maxWidth: "320px",
+              height: "1px",
+              background:
+                "linear-gradient(90deg, transparent, var(--glass-border), transparent)",
+            }}
+          />
+
+          <p
+            style={{
+              marginTop: "clamp(1rem, 2.5vw, 1.5rem)",
+              fontSize: "clamp(0.75rem, 1.8vw, 0.875rem)",
+              color: "var(--text-muted)",
+            }}
+          >
+            Need access?{" "}
+            <Link
+              to="/contact"
+              style={{ color: "var(--neon-cyan)", textDecoration: "none" }}
+            >
+              Contact support →
+            </Link>
+          </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

@@ -23,6 +23,11 @@ exports.createTournament = asyncHandler(async (req, res) => {
         return sendResponse(res, errorResponse("Invalid tournament type. Must be one of: " + VALID_TYPES.join(", "), 400));
     }
 
+    // Validate status if provided
+    if (req.body.status && !VALID_STATUSES.includes(req.body.status.trim())) {
+        return sendResponse(res, errorResponse("Invalid tournament status. Must be one of: " + VALID_STATUSES.join(", "), 400));
+    }
+
     // Validate format
     if (format && !VALID_FORMATS.includes(format.trim())) {
         return sendResponse(res, errorResponse("Invalid tournament format. Must be one of: " + VALID_FORMATS.join(", "), 400));
@@ -97,7 +102,7 @@ exports.createTournament = asyncHandler(async (req, res) => {
         registrationStart: registrationStart ? new Date(registrationStart) : start,
         registrationDeadline: registrationDeadline ? new Date(registrationDeadline) : start,
         banner: banner || "",
-        status: "draft"
+        status: req.body.status && VALID_STATUSES.includes(req.body.status.trim()) ? req.body.status.trim() : "draft"
     });
     
     sendResponse(res, successResponse("Tournament created successfully", tournament, 201));

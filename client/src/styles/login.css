@@ -18,8 +18,8 @@
 .login-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 10% 0%, rgba(0, 255, 163, 0.12), transparent 55%), 
-              radial-gradient(circle at 100% 10%, rgba(138, 43, 226, 0.12), transparent 55%);
+  background: radial-gradient(circle at 10% 0%, rgba(0, 212, 255, 0.12), transparent 55%), 
+              radial-gradient(circle at 100% 10%, rgba(118, 87, 255, 0.12), transparent 55%);
   pointer-events: none;
 }
 
@@ -93,8 +93,8 @@
 
 .login-input:focus {
   border-color: var(--neon-cyan);
-  background: rgba(0, 255, 163, 0.05);
-  box-shadow: 0 0 0 3px rgba(0, 255, 163, 0.15);
+  background: rgba(0, 212, 255, 0.05);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
 }
 
 .login-input::placeholder {
@@ -122,7 +122,7 @@
 
 .login-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 255, 163, 0.18);
+  box-shadow: 0 8px 20px rgba(0, 212, 255, 0.18);
   filter: saturate(1.1);
 }
 
@@ -156,10 +156,10 @@
 }
 
 .login-success {
-  background: rgba(0, 255, 163, 0.12);
-  border-color: rgba(0, 255, 163, 0.35);
+  background: rgba(0, 212, 255, 0.12);
+  border-color: rgba(0, 212, 255, 0.35);
   color: var(--neon-cyan);
-  box-shadow: 0 0 20px rgba(0, 255, 163, 0.3);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
 }
 
 /* ---------- LINKS ---------- */
@@ -217,4 +217,180 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+
+/* ==========================================================================
+   OBSIDIAN CYBER ARENA — EDITORIAL AUTH SPLIT COMPOSITION
+   ========================================================================== */
+.auth-editorial-shell {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.15fr) minmax(360px, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  max-width: 1200px;
+  width: 100%;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .auth-editorial-shell {
+    grid-template-columns: 1fr;
+  }
+  .auth-editorial-side {
+    display: none;
+  }
+}
+
+.auth-editorial-side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.auth-editorial-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: rgba(118, 87, 255, 0.15);
+  color: var(--accent-primary);
+  border: 1px solid rgba(118, 87, 255, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+}
+
+.auth-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-secondary);
+  box-shadow: 0 0 8px var(--accent-secondary);
+}
+
+.auth-editorial-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2.25rem, 4.5vw, 3.25rem);
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.auth-editorial-desc {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.auth-telemetry-cluster {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.auth-telemetry-tile {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.auth-telemetry-val {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--accent-secondary);
+}
+
+.auth-telemetry-lbl {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.auth-quote-card {
+  background: rgba(23, 21, 38, 0.5);
+  border-left: 3px solid var(--accent-primary);
+  padding: 1rem 1.25rem;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.auth-quote-text {
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0 0 0.5rem;
+}
+
+.auth-quote-author {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.auth-card-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-card-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.auth-features-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.auth-feature-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.auth-feature-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border-subtle);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-feature-row strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.auth-feature-row p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin: 0;
 }
